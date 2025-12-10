@@ -3,33 +3,7 @@ import { FlatList, Text, View, Platform, StyleSheet } from 'react-native';
 import React from 'react';
 import { Link } from 'expo-router';
 
-const DATA = [
-  { id: '1', title: 'First Item' },
-  { id: '2', title: 'Second Item' },
-  { id: '3', title: 'Third Item' },
-];
-
-type ItemProps = {
-  title: string;
-};
-
-const Item = ({ title }: ItemProps) => (
-  <View style={styles.item}>
-    <Text style={styles.itemText}>{title}</Text>
-  </View>
-);
-const MyFlatList = () => {
-  return (
-    <FlatList
-      data={DATA}
-      renderItem={({ item }) => <Item title={item.title} />}
-      keyExtractor={item => item.id}
-    />
-  );
-};
-
-
-export default function HomeScreen() {
+export default function Resource() {
 }
 
 const styles = StyleSheet.create({
