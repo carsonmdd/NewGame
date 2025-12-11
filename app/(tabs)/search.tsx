@@ -1,7 +1,15 @@
-// app/(tabs)/search.tsx
+import { Ionicons } from '@expo/vector-icons';
 import { Asset } from 'expo-asset';
 import React, { useEffect, useState } from 'react';
-import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import { RESOURCE_DEFS } from '@/constants/resources';
 
@@ -23,13 +31,11 @@ export default function SearchScreen() {
         const loaded: Resource[] = [];
 
         for (const def of RESOURCE_DEFS) {
-          // resolve & download the asset
           const asset = Asset.fromModule(def.asset);
           await asset.downloadAsync();
 
           if (!asset.localUri) continue;
 
-          // read its text content
           const res = await fetch(asset.localUri);
           const text = await res.text();
 
@@ -59,103 +65,193 @@ export default function SearchScreen() {
     );
   });
 
+  // For now, treat the last 2 filtered items as "recently saved"
+  const recentlySaved = filtered.slice(-2);
+
   const handlePress = (item: Resource) => {
-    // For now: show the whole txt content in an alert.
-    // Later: navigate to a detail screen instead.
+    // TODO: replace this Alert with navigation to your detail screen if desired
     Alert.alert(item.title, item.content);
   };
 
-  const renderItem = ({ item }: { item: Resource }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => handlePress(item)}
-      activeOpacity={0.7}
-    >
-      <Text style={styles.cardTitle}>{item.title}</Text>
-      <Text style={styles.cardPreview} numberOfLines={3}>
-        {item.content}
-      </Text>
-    </TouchableOpacity>
-  );
-
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Search</Text>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search by title or text…"
-          placeholderTextColor="#9CA3AF"
-          value={query}
-          onChangeText={setQuery}
-          returnKeyType="search"
-        />
-      </View>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Top bar with small "Search" label + menu icon */}
+        <View style={styles.topBar}>
+          <Text style={styles.screenLabel}>Search</Text>
+        </View>
 
-      <FlatList
-        data={filtered}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          !loading ? (
-            <Text style={styles.emptyText}>No resources found.</Text>
-          ) : null
-        }
-      />
+        {/* Big heading */}
+        <Text style={styles.bigTitle}>What are you looking for?</Text>
+
+        {/* Search bar */}
+        <View style={styles.searchBar}>
+          <Ionicons
+            name="search"
+            size={18}
+            color="#F9FAFB"
+            style={styles.searchIcon}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search"
+            placeholderTextColor="#E5E7EB"
+            value={query}
+            onChangeText={setQuery}
+            returnKeyType="search"
+          />
+        </View>
+
+        {/* Search section */}
+        {loading && filtered.length === 0 ? (
+          <Text style={styles.subtleText}>Loading resources…</Text>
+        ) : filtered.length === 0 ? (
+          <Text style={styles.subtleText}>No resources found.</Text>
+        ) : (
+          <View style={styles.grid}>
+            {filtered.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.card}
+                activeOpacity={0.7}
+                onPress={() => handlePress(item)}
+              >
+                <Text style={styles.cardTitle} numberOfLines={2}>
+                  {item.title}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Recently Saved section */}
+        {recentlySaved.length > 0 && (
+          <>
+            <Text style={[styles.sectionLabel, styles.sectionSpacing]}>
+              Recently Saved
+            </Text>
+            <View style={styles.grid}>
+              {recentlySaved.map((item) => (
+                <TouchableOpacity
+                  key={`recent-${item.id}`}
+                  style={styles.card}
+                  activeOpacity={0.7}
+                  onPress={() => handlePress(item)}
+                >
+                  <Text style={styles.cardTitle} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        )}
+      </ScrollView>
     </View>
   );
 }
 
+const PURPLE = '#8C4D93';
+const BG = '#050509';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#020617',
+    backgroundColor: BG,
   },
-  header: {
+  scrollContent: {
+    paddingHorizontal: 20,
     paddingTop: 16,
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-    backgroundColor: '#020617',
+    paddingBottom: 32,
   },
-  headerTitle: {
+
+  // Top bar
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  screenLabel: {
+    color: '#9CA3AF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  menuButton: {
+    padding: 6,
+  },
+  menuLine: {
+    height: 2,
+    width: 18,
+    backgroundColor: '#F9FAFB',
+    marginVertical: 2,
+    borderRadius: 999,
+  },
+
+  // Heading + search
+  bigTitle: {
     color: '#F9FAFB',
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '700',
-    marginBottom: 8,
+    marginBottom: 16,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: PURPLE,
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    marginBottom: 24,
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   searchInput: {
-    backgroundColor: '#111827',
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    flex: 1,
     color: '#F9FAFB',
     fontSize: 14,
   },
-  listContent: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 16,
+
+  // Sections
+  sectionLabel: {
+    color: '#E5E7EB',
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  sectionSpacing: {
+    marginTop: 24,
+  },
+  subtleText: {
+    color: '#9CA3AF',
+    fontSize: 13,
+    marginBottom: 8,
+  },
+
+  // Grid of cards
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
   card: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
+    backgroundColor: PURPLE,
+    borderRadius: 18,
     padding: 12,
-    marginBottom: 10,
+    marginBottom: 14,
+    width: '48%', // two columns
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 80,
   },
   cardTitle: {
     color: '#F9FAFB',
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  cardPreview: {
-    color: '#D1D5DB',
     fontSize: 14,
-  },
-  emptyText: {
-    marginTop: 16,
+    fontWeight: '600',
     textAlign: 'center',
-    color: '#9CA3AF',
   },
 });
