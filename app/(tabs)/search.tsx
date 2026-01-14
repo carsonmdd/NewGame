@@ -14,9 +14,14 @@ import {
 import { RESOURCE_DEFS } from '@/constants/resources';
 
 type Resource = {
-  id: string;
+  rid: number;
+  fileType: string;
   title: string;
   content: string;
+  description: string;
+  date: string;
+  creator: number;
+  author: string;
 };
 
 export default function SearchScreen() {
@@ -31,18 +36,24 @@ export default function SearchScreen() {
         const loaded: Resource[] = [];
 
         for (const def of RESOURCE_DEFS) {
-          const asset = Asset.fromModule(def.asset);
-          await asset.downloadAsync();
+          const content = Asset.fromModule(def.content);
+          await content.downloadAsync();
 
-          if (!asset.localUri) continue;
+          if (!content.localUri) continue;
 
-          const res = await fetch(asset.localUri);
+          const res = await fetch(content.localUri);
           const text = await res.text();
 
           loaded.push({
-            id: def.id,
+            rid: def.rid,
+            fileType: def.fileType,
             title: def.title,
-            content: text,
+            content: def.content,
+            description: def.description,
+            date: def.date,
+            creator: def.creator,
+            author: def.author,
+
           });
         }
 
@@ -114,7 +125,7 @@ export default function SearchScreen() {
           <View style={styles.grid}>
             {filtered.map((item) => (
               <TouchableOpacity
-                key={item.id}
+                key={item.rid}
                 style={styles.card}
                 activeOpacity={0.7}
                 onPress={() => handlePress(item)}
@@ -136,7 +147,7 @@ export default function SearchScreen() {
             <View style={styles.grid}>
               {recentlySaved.map((item) => (
                 <TouchableOpacity
-                  key={`recent-${item.id}`}
+                  key={`recent-${item.rid}`}
                   style={styles.card}
                   activeOpacity={0.7}
                   onPress={() => handlePress(item)}
