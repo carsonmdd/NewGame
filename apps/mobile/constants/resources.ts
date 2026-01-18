@@ -1,35 +1,66 @@
 // constants/resources.ts
 
 export type ResourceDef = {
-  id: string;
+  rid: number;
+  fileType: string;
   title: string;
-  asset: any;
+  content: string;
+  description: string;
+  date: string;
+  creator: number;
+  author: string;
 };
 
 export const RESOURCE_DEFS: ResourceDef[] = [
   {
-    id: 'cityecho',
-    title: 'City Echo',
-    asset: require('../assets/resources/CityEcho.txt'),
-  },
-  {
-    id: 'mountainsteps',
-    title: 'Mountain Steps',
-    asset: require('../assets/resources/MountainSteps.txt'),
-  },
-  {
-    id: 'oceannotes',
-    title: 'Ocean Notes',
-    asset: require('../assets/resources/OceanNotes.txt'),
-  },
-  {
-    id: 'randomone',
-    title: 'Random One',
-    asset: require('../assets/resources/RandomOne.txt'),
-  },
-  {
-    id: 'silentlibrary',
-    title: 'Silent Library',
-    asset: require('../assets/resources/SilentLibrary.txt'),
-  },
+  rid: 1,
+  fileType: "txt",
+  title: "City Echo",
+  content: require("../assets/resources/CityEcho.txt"),
+  description: "A description of text",
+  date: Date(),
+  creator: 1,
+  author: "Fredick Figgle Bottom",
+},
+{
+  rid: 2,
+  fileType: "txt",
+  title: "Mountain Steps",
+  content: require("../assets/resources/MountainSteps.txt"),
+  description: "A description of text",
+  date: Date(),
+  creator: 1,
+  author: "Fredick Figgle Bottom",
+},
+{
+  rid: 3,
+  fileType: "txt",
+  title: "Ocean Notes",
+  content: require("../assets/resources/OceanNotes.txt"),
+  description: "A description of text",
+  date: Date(),
+  creator: 1,
+  author: "Fredick Figgle Bottom",
+},
+{
+  rid: 4,
+  fileType: "txt",
+  title: "Random One",
+  content: require("../assets/resources/RandomOne.txt"),
+  description: "A description of text",
+  date: Date(),
+  creator: 1,
+  author: "Fredick Figgle Bottom",
+},
+{
+  rid: 5,
+  fileType: "txt",
+  title: "Silent Library",
+  content: require("../assets/resources/SilentLibrary.txt"),
+  description: "A description of text",
+  date: Date(),
+  creator: 1,
+  author: "Fredick Figgle Bottom",
+},
+
 ];
