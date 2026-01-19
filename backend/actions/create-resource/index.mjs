@@ -1,8 +1,15 @@
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { v4 as uuidv4 } from "uuid";
+
+const client = new DynamoDBClient({});
+const docClient = DynamoDBDocumentClient.from(client);
+
 export const handler = async (event) => {
 	// console.log("Received event:", event);
 
 	try {
-		// 1. Parse request body
+		// Parse request body
 		if (!event.body) {
 			return {
 				statusCode: 400,
@@ -17,7 +24,7 @@ export const handler = async (event) => {
 
 		const body = JSON.parse(event.body);
 
-		// 2. Basic validation (keep intentionally light)
+		// Basic validation
 		const requiredFields = ["title", "resourceType", "url"];
 
 		for (const field of requiredFields) {
@@ -34,11 +41,13 @@ export const handler = async (event) => {
 			}
 		}
 
-		// 3. Simulate resource creation
-		const resourceId = `res_${Math.random().toString(36).substring(2, 10)}`;
+		// Generate IDs and timestamps
+		const resourceId = `res_${uuidv4()}`;
 		const now = new Date().toISOString();
 
 		const resource = {
+			pk: "RESOURCE",
+			sk: resourceId,
 			id: resourceId,
 			title: body.title,
 			description: body.description ?? "",
@@ -51,7 +60,14 @@ export const handler = async (event) => {
 			updatedAt: now,
 		};
 
-		// 4. Return realistic success response
+		const command = new PutCommand({
+			TableName: "Resource",
+			Item: resource,
+		});
+
+		await docClient.send(command);
+
+		// Return the created resource
 		return {
 			statusCode: 201,
 			body: JSON.stringify({

@@ -1,14 +1,20 @@
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+
+const client = new DynamoDBClient({});
+const docClient = DynamoDBDocumentClient.from(client);
+
 export const handler = async (event) => {
 	try {
-		// 1. Validate path parameter
-		const { id } = event.pathParameters || {};
-		if (!id) {
+		// 1. Extract path parameters
+		const { pk, sk } = event.pathParameters || {};
+		if (!pk || !sk) {
 			return {
 				statusCode: 400,
 				body: JSON.stringify({
 					error: {
 						code: "VALIDATION_ERROR",
-						message: "Resource ID is required in the path",
+						message: "Both pk and sk are required in the path",
 					},
 				}),
 			};
@@ -29,7 +35,7 @@ export const handler = async (event) => {
 
 		const body = JSON.parse(event.body);
 
-		// 3. Minimal validation
+		// 3. Validate resourceType if provided
 		if (
 			body.resourceType &&
 			!["guide", "video", "tool"].includes(body.resourceType)
@@ -45,38 +51,60 @@ export const handler = async (event) => {
 			};
 		}
 
-		// 4. Simulate existing resource
-		const existingResource = {
-			id,
-			title: "Existing Title",
-			description: "Existing Description",
-			resourceType: "guide",
-			url: "https://example.com",
-			tags: ["unity", "physics"],
-			creatorId: "creator_123",
-			difficulty: "beginner",
-			createdAt: "2026-01-10T12:00:00.000Z",
-			updatedAt: "2026-01-10T12:00:00.000Z",
+		// 4. Build DynamoDB UpdateExpression dynamically
+		const updateFields = { ...body, updatedAt: new Date().toISOString() };
+		const ExpressionAttributeNames = {};
+		const ExpressionAttributeValues = {};
+		const setExpressions = [];
+
+		Object.keys(updateFields).forEach((key, idx) => {
+			const attrName = `#field${idx}`;
+			const attrValue = `:value${idx}`;
+			ExpressionAttributeNames[attrName] = key;
+			ExpressionAttributeValues[attrValue] = updateFields[key];
+			setExpressions.push(`${attrName} = ${attrValue}`);
+		});
+
+		const command = {
+			TableName: "Resource",
+			Key: { pk: pk, sk: sk },
+			UpdateExpression: "SET " + setExpressions.join(", "),
+			ExpressionAttributeNames,
+			ExpressionAttributeValues,
+			ConditionExpression:
+				"attribute_exists(pk) AND attribute_exists(sk)", // ensures the item exists
+			ReturnValues: "ALL_NEW", // return the updated item
 		};
 
-		// 5. Merge updates
-		const updatedResource = {
-			...existingResource,
-			...body,
-			updatedAt: new Date().toISOString(),
-		};
+		// 5. Perform the update
+		const result = await docClient.send(new UpdateCommand(command));
 
-		console.log(`Updated resource ${id}:`, updatedResource);
-
-		// 6. Return success
+		// 6. Return success with updated resource
 		return {
 			statusCode: 200,
+			headers: {
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Origin": "*",
+			},
 			body: JSON.stringify({
-				data: updatedResource,
+				data: result.Attributes,
 			}),
 		};
 	} catch (error) {
 		console.error("updateResource error:", error);
+
+		// Handle item not found
+		if (error.name === "ConditionalCheckFailedException") {
+			return {
+				statusCode: 404,
+				body: JSON.stringify({
+					error: {
+						code: "NOT_FOUND",
+						message: "Resource does not exist",
+					},
+				}),
+			};
+		}
 
 		return {
 			statusCode: 500,
