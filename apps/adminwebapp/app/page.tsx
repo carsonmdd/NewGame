@@ -34,7 +34,6 @@ export default function Home() {
 			if (editingResource === "new") {
 				await resourceApi.create(input);
 			} else if (editingResource) {
-				console.log(input);
 				await resourceApi.update(
 					editingResource.pk,
 					editingResource.sk,
@@ -65,11 +64,10 @@ export default function Home() {
 
 	return (
 		<div className='p-8 max-w-6xl mx-auto'>
-			<div className='flex justify-between mb-6'>
-				<h1 className='text-2xl font-bold'>Game Resources</h1>
+			<div className='flex justify-end mb-6'>
 				<button
 					onClick={() => setEditingResource("new")}
-					className='bg-green-600 text-white px-4 py-2 rounded'
+					className='bg-green-600 text-white px-4 py-2 rounded hover:cursor-pointer'
 				>
 					+ Add Resource
 				</button>
@@ -109,13 +107,13 @@ export default function Home() {
 							<td className='border p-2 space-x-2'>
 								<button
 									onClick={() => setEditingResource(r)}
-									className='text-blue-600 underline'
+									className='text-blue-600 hover:cursor-pointer'
 								>
 									Edit
 								</button>
 								<button
 									onClick={() => handleDelete(r)}
-									className='text-red-600 underline'
+									className='text-red-600 hover:cursor-pointer'
 								>
 									Delete
 								</button>

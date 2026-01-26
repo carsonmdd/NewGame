@@ -101,6 +101,8 @@ export default function ResourceForm({
 						}
 					>
 						<option value='video'>Video</option>
+						<option value='guide'>Guide</option>
+						<option value='audio'>Audio</option>
 						<option value='model'>Model</option>
 						<option value='texture'>Texture</option>
 						<option value='script'>Script</option>
@@ -131,14 +133,14 @@ export default function ResourceForm({
 			<div className='flex gap-2 pt-4'>
 				<button
 					type='submit'
-					className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-medium transition-colors'
+					className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-medium transition-colors hover:cursor-pointer'
 				>
 					Save Resource
 				</button>
 				<button
 					type='button'
 					onClick={onCancel}
-					className='bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded font-medium transition-colors'
+					className='bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded font-medium transition-colors hover:cursor-pointer'
 				>
 					Cancel
 				</button>

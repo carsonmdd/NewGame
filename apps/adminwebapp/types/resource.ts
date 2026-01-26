@@ -4,7 +4,7 @@ export interface Resource {
 	id: string;
 	title: string;
 	description: string;
-	resourceType: "model" | "texture" | "script" | "audio" | "video";
+	resourceType: "model" | "texture" | "script" | "audio" | "video" | "guide";
 	url: string;
 	tags: string[];
 	difficulty: "beginner" | "intermediate" | "advanced";
