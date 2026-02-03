@@ -11,6 +11,8 @@ import {
   View,
 } from 'react-native';
 
+import { router } from 'expo-router';
+
 import { RESOURCE_DEFS } from '@/constants/resources';
 
 type Resource = {
@@ -114,6 +116,17 @@ export default function SearchScreen() {
             onChangeText={setQuery}
             returnKeyType="search"
           />
+
+          {/*  Filter button (routes to /filter). */}
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Open filters"
+            activeOpacity={0.7}
+            style={styles.filterBtn}
+            onPress={() => router.push('../filter')}
+          >
+            <Ionicons name="options-outline" size={18} color="#F9FAFB" />
+          </TouchableOpacity>
         </View>
 
         {/* Search section */}
@@ -225,6 +238,13 @@ const styles = StyleSheet.create({
     flex: 1,
     color: '#F9FAFB',
     fontSize: 14,
+  },
+
+  // Filter icon container
+  filterBtn: {
+    marginLeft: 8,
+    padding: 6,
+    borderRadius: 999,
   },
 
   // Sections
