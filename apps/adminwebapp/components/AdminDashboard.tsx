@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { resourceApi } from "@/lib/api";
 import { Resource, ResourceInput } from "@/types/resource";
 import ResourceForm from "@/components/ResourceForm";
+import { useResourceCSV } from "@/hooks/useResourceCSV";
+import CSVToolbar from "./CSVToolbar";
 
 type Props = {};
 
@@ -26,6 +28,11 @@ const AdminDashboard = (props: Props) => {
 			setLoading(false);
 		}
 	};
+
+	const { handleExport, handleImport } = useResourceCSV(
+		resources,
+		loadResources,
+	);
 
 	useEffect(() => {
 		loadResources();
@@ -67,9 +74,10 @@ const AdminDashboard = (props: Props) => {
 	return (
 		<div className='p-8 max-w-6xl mx-auto'>
 			<div className='flex justify-end mb-6'>
+				<CSVToolbar onExport={handleExport} onImport={handleImport} />
 				<button
 					onClick={() => setEditingResource("new")}
-					className='bg-green-600 text-white px-4 py-2 rounded hover:cursor-pointer'
+					className='bg-green-600 text-white px-4 py-2 rounded hover:cursor-pointer ml-2'
 				>
 					+ Add Resource
 				</button>
