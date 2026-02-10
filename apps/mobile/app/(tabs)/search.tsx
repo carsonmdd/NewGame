@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Asset } from 'expo-asset';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   ScrollView,
@@ -29,7 +29,6 @@ export default function SearchScreen() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Load all txt files from the manifest
   useEffect(() => {
     const loadResources = async () => {
       try {
@@ -48,12 +47,11 @@ export default function SearchScreen() {
             rid: def.rid,
             fileType: def.fileType,
             title: def.title,
-            content: def.content,
+            content: text,
             description: def.description,
             date: def.date,
             creator: def.creator,
             author: def.author,
-
           });
         }
 
@@ -68,19 +66,21 @@ export default function SearchScreen() {
     loadResources();
   }, []);
 
-  const filtered = resources.filter((r) => {
-    const q = query.toLowerCase();
-    return (
-      r.title.toLowerCase().includes(q) ||
-      r.content.toLowerCase().includes(q)
-    );
-  });
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return resources;
 
-  // For now, treat the last 2 filtered items as "recently saved"
+    return resources.filter((r) => {
+      return (
+        r.title.toLowerCase().includes(q) ||
+        r.content.toLowerCase().includes(q)
+      );
+    });
+  }, [resources, query]);
+
   const recentlySaved = filtered.slice(-2);
 
   const handlePress = (item: Resource) => {
-    // TODO: replace this Alert with navigation to your detail screen if desired
     Alert.alert(item.title, item.content);
   };
 
@@ -90,33 +90,39 @@ export default function SearchScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Top bar with small "Search" label + menu icon */}
+        {/* Top bar: big Search + avatar */}
         <View style={styles.topBar}>
           <Text style={styles.screenLabel}>Search</Text>
+
+          <View style={styles.avatarCircle}>
+            <Ionicons name="person" size={18} color="#111" />
+          </View>
         </View>
 
-        {/* Big heading */}
-        <Text style={styles.bigTitle}>What are you looking for?</Text>
+        {/* Search bar row */}
+        <View style={styles.searchRow}>
+          <View style={styles.searchBar}>
+            <Ionicons
+              name="search"
+              size={18}
+              color="rgba(255,255,255,0.85)"
+              style={styles.searchIcon}
+            />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Guides, videos, tutorials, and more"
+              placeholderTextColor="rgba(255,255,255,0.55)"
+              value={query}
+              onChangeText={setQuery}
+              returnKeyType="search"
+            />
+          </View>
 
-        {/* Search bar */}
-        <View style={styles.searchBar}>
-          <Ionicons
-            name="search"
-            size={18}
-            color="#F9FAFB"
-            style={styles.searchIcon}
-          />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search"
-            placeholderTextColor="#E5E7EB"
-            value={query}
-            onChangeText={setQuery}
-            returnKeyType="search"
-          />
+          <View style={styles.filterBtn}>
+            <Ionicons name="options-outline" size={20} color="#111" />
+          </View>
         </View>
 
-        {/* Search section */}
         {loading && filtered.length === 0 ? (
           <Text style={styles.subtleText}>Loading resources…</Text>
         ) : filtered.length === 0 ? (
@@ -127,10 +133,10 @@ export default function SearchScreen() {
               <TouchableOpacity
                 key={item.rid}
                 style={styles.card}
-                activeOpacity={0.7}
+                activeOpacity={0.85}
                 onPress={() => handlePress(item)}
               >
-                <Text style={styles.cardTitle} numberOfLines={2}>
+                <Text style={styles.cardTitle} numberOfLines={3}>
                   {item.title}
                 </Text>
               </TouchableOpacity>
@@ -138,7 +144,6 @@ export default function SearchScreen() {
           </View>
         )}
 
-        {/* Recently Saved section */}
         {recentlySaved.length > 0 && (
           <>
             <Text style={[styles.sectionLabel, styles.sectionSpacing]}>
@@ -149,10 +154,10 @@ export default function SearchScreen() {
                 <TouchableOpacity
                   key={`recent-${item.rid}`}
                   style={styles.card}
-                  activeOpacity={0.7}
+                  activeOpacity={0.85}
                   onPress={() => handlePress(item)}
                 >
-                  <Text style={styles.cardTitle} numberOfLines={2}>
+                  <Text style={styles.cardTitle} numberOfLines={3}>
                     {item.title}
                   </Text>
                 </TouchableOpacity>
@@ -165,8 +170,8 @@ export default function SearchScreen() {
   );
 }
 
-const PURPLE = '#8C4D93';
-const BG = '#050509';
+const BG = '#0B0B0F';
+const CARD = '#17133A';
 
 const styles = StyleSheet.create({
   container: {
@@ -174,8 +179,8 @@ const styles = StyleSheet.create({
     backgroundColor: BG,
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingTop: 12,
     paddingBottom: 32,
   },
 
@@ -187,58 +192,66 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   screenLabel: {
-    color: '#9CA3AF',
-    fontSize: 14,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontSize: 34,
+    fontWeight: '900',
   },
-  menuButton: {
-    padding: 6,
-  },
-  menuLine: {
-    height: 2,
-    width: 18,
-    backgroundColor: '#F9FAFB',
-    marginVertical: 2,
-    borderRadius: 999,
+  avatarCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#E9F1FF',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
-  // Heading + search
-  bigTitle: {
-    color: '#F9FAFB',
-    fontSize: 24,
-    fontWeight: '700',
+  // Search row
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
     marginBottom: 16,
   },
   searchBar: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: PURPLE,
+    backgroundColor: 'rgba(255,255,255,0.12)',
     borderRadius: 999,
     paddingHorizontal: 14,
-    paddingVertical: 8,
-    marginBottom: 24,
+    height: 44,
   },
   searchIcon: {
-    marginRight: 8,
+    marginRight: 10,
   },
   searchInput: {
     flex: 1,
-    color: '#F9FAFB',
+    color: '#FFFFFF',
     fontSize: 14,
+  },
+  filterBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // Sections
   sectionLabel: {
-    color: '#E5E7EB',
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 8,
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 13,
+    fontWeight: '800',
+    marginBottom: 10,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   sectionSpacing: {
-    marginTop: 24,
+    marginTop: 18,
   },
   subtleText: {
-    color: '#9CA3AF',
+    color: 'rgba(255,255,255,0.65)',
     fontSize: 13,
     marginBottom: 8,
   },
@@ -250,19 +263,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   card: {
-    backgroundColor: PURPLE,
+    backgroundColor: CARD,
     borderRadius: 18,
     padding: 12,
     marginBottom: 14,
-    width: '48%', // two columns
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: 80,
+    width: '48%',
+    minHeight: 160,
+    justifyContent: 'flex-end',
   },
   cardTitle: {
-    color: '#F9FAFB',
-    fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '900',
+    lineHeight: 20,
   },
 });
