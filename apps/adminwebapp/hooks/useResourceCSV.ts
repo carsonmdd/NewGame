@@ -67,7 +67,7 @@ export const useResourceCSV = (resources: Resource[], refresh: () => void) => {
 							return formattedItem;
 						});
 
-						await resourceApi.batchCreate({
+						await resourceApi.create({
 							items: formattedBatch,
 						});
 

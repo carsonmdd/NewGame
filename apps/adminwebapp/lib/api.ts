@@ -12,10 +12,9 @@ interface ApiResponse<T> {
 
 export const resourceApi = {
 	getAll: () => api.get<ApiResponse<Resource[]>>("/resources"),
-	create: (data: ResourceInput) => api.post<Resource>("/resource", data),
-	batchCreate: (data: { items: ResourceInput[] }) =>
+	create: (data: { items: ResourceInput[] }) =>
 		api.post<Resource[]>("/resources", data),
-	update: (pk: string, sk: string, data: ResourceInput) =>
-		api.put<Resource>(`/resource/${pk}/${sk}`, data),
-	delete: (pk: string, sk: string) => api.delete(`/resource/${pk}/${sk}`),
+	update: (sk: string, data: ResourceInput) =>
+		api.put<Resource>(`/resources/${sk}`, data),
+	delete: (sk: string) => api.delete(`/resources/${sk}`),
 };

@@ -1,10 +1,10 @@
 "use client";
 import { useMemo, useState } from "react";
-import { Resource, ResourceInput } from "@/types/resource";
+import { ResourceInput } from "@/types/resource";
 import OpenAI from "openai";
 
 interface Props {
-	initialData?: Resource;
+	initialData?: ResourceInput;
 	onSubmit: (data: ResourceInput) => void;
 	onCancel: () => void;
 }
