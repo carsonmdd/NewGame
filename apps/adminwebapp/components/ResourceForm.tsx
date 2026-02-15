@@ -198,44 +198,43 @@ export default function ResourceForm({ initialData, onSubmit, onCancel }: Props)
       {/* Auto Tag Button */}
       <button
       type="button"
+      disabled={autoTagLoading}
       onClick={async () => {
         try {
-        setAutoTagLoading(true);
-        setAutoTagEvidence([]);
+          setAutoTagLoading(true);
+          setAutoTagEvidence([]);
 
-        const res = await fetch("/api/auto-tag", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-          title: formData.title,
-          description: formData.description,
-          url: formData.url,
-          resourceType: formData.resourceType,
-          }),
-        });
+          const res = await fetch("/api/auto-tag", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              title: formData.title,
+              description: formData.description,
+              url: formData.url,
+              resourceType: formData.resourceType,
+            }),
+          });
 
-        if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(`HTTP ${res.status} ${res.statusText} - ${txt.slice(0, 200)}`);
-        }
+          if (!res.ok) {
+            const txt = await res.text();
+            throw new Error(`HTTP ${res.status} - ${txt}`);
+          }
 
-        const data = await res.json();
+          const data: { tags: string[]; evidence: string[] } = await res.json();
 
-        setFormData((prev) => ({ ...prev, tags: data.tags }));
-        setAutoTagEvidence(
-          (data.evidence ?? []).map((e: any) => e.note)
-        );
+          // Overwrite tags with AI result (or merge if you prefer)
+          setFormData((prev) => ({ ...prev, tags: data.tags }));
+          setAutoTagEvidence(data.evidence ?? []);
         } catch (e: any) {
-        alert(`Auto tag failed: ${e?.message ?? e}`);
+          alert(`Auto tag failed: ${e?.message ?? e}`);
         } finally {
-        setAutoTagLoading(false);
+          setAutoTagLoading(false);
         }
       }}
-      disabled={autoTagLoading}
       className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded text-sm font-medium transition disabled:opacity-60"
-      >
+    >
       {autoTagLoading ? "Tagging..." : "Auto Tag"}
-      </button>
+    </button>
 
       {/* Save and Cancel Buttons */}
       <div className="flex gap-2 pt-4">
