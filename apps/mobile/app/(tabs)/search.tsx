@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Asset } from 'expo-asset';
 import React, { useEffect, useState } from 'react';
 import {
 	Alert,
@@ -36,19 +35,11 @@ export default function SearchScreen() {
 				const loaded: Resource[] = [];
 
 				for (const def of RESOURCE_DEFS) {
-					const content = Asset.fromModule(def.content);
-					await content.downloadAsync();
-
-					if (!content.localUri) continue;
-
-					const res = await fetch(content.localUri);
-					const text = await res.text();
-
 					loaded.push({
 						rid: def.rid,
 						fileType: def.fileType,
 						title: def.title,
-						content: text,
+						content: def.content,
 						description: def.description,
 						date: def.date,
 						creator: def.creator,
