@@ -2,46 +2,62 @@ import { Ionicons } from '@expo/vector-icons';
 import { Asset } from 'expo-asset';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+	Alert,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View,
 } from 'react-native';
 
 import { RESOURCE_DEFS } from '@/constants/resources';
 
 type Resource = {
-  rid: number;
-  fileType: string;
-  title: string;
-  content: string;
-  description: string;
-  date: string;
-  creator: number;
-  author: string;
+	rid: number;
+	fileType: string;
+	title: string;
+	content: string;
+	description: string;
+	date: string;
+	creator: number;
+	author: string;
 };
 
 export default function SearchScreen() {
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [query, setQuery] = useState('');
-  const [loading, setLoading] = useState(true);
+	const [resources, setResources] = useState<Resource[]>([]);
+	const [query, setQuery] = useState('');
+	const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadResources = async () => {
-      try {
-        const loaded: Resource[] = [];
+	// Load all txt files from the manifest
+	useEffect(() => {
+		const loadResources = async () => {
+			try {
+				const loaded: Resource[] = [];
 
-        for (const def of RESOURCE_DEFS) {
-          const content = Asset.fromModule(def.content);
-          await content.downloadAsync();
+				for (const def of RESOURCE_DEFS) {
+					loaded.push({
+						rid: def.rid,
+						fileType: def.fileType,
+						title: def.title,
+						content: def.content,
+						description: def.description,
+						date: def.date,
+						creator: def.creator,
+						author: def.author,
+					});
+				}
 
-          if (!content.localUri) continue;
+				setResources(loaded);
+			} catch (err) {
+				console.error('Failed to load resources:', err);
+			} finally {
+				setLoading(false);
+			}
+		};
 
-          const res = await fetch(content.localUri);
-          const text = await res.text();
+		loadResources();
+	}, []);
 
           loaded.push({
             rid: def.rid,
@@ -55,16 +71,21 @@ export default function SearchScreen() {
           });
         }
 
-        setResources(loaded);
-      } catch (err) {
-        console.error('Failed to load resources:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+	const handlePress = (item: Resource) => {
+		// TODO: replace this Alert with navigation to your detail screen if desired
+		Alert.alert(item.title, item.content);
+	};
 
-    loadResources();
-  }, []);
+	return (
+		<View style={styles.container}>
+			<ScrollView
+				contentContainerStyle={styles.scrollContent}
+				showsVerticalScrollIndicator={false}
+			>
+				{/* Top bar with small "Search" label + menu icon */}
+				<View style={styles.topBar}>
+					<Text style={styles.screenLabel}>Search</Text>
+				</View>
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
