@@ -11,6 +11,8 @@ import {
 	View,
 } from 'react-native';
 
+import { router } from 'expo-router';
+
 import { RESOURCE_DEFS } from '@/constants/resources';
 
 type Resource = {
@@ -144,6 +146,58 @@ export default function SearchScreen() {
 					</View>
 				)}
 
+        {/* Search bar */}
+        <View style={styles.searchBar}>
+          <Ionicons
+            name="search"
+            size={18}
+            color="#F9FAFB"
+            style={styles.searchIcon}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search"
+            placeholderTextColor="#E5E7EB"
+            value={query}
+            onChangeText={setQuery}
+            returnKeyType="search"
+          />
+
+          {/*  Filter button (routes to /filter). */}
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Open filters"
+            activeOpacity={0.7}
+            style={styles.filterBtn}
+            onPress={() => router.push('../filter')}
+          >
+            <Ionicons name="options-outline" size={18} color="#F9FAFB" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Search section */}
+        {loading && filtered.length === 0 ? (
+          <Text style={styles.subtleText}>Loading resources…</Text>
+        ) : filtered.length === 0 ? (
+          <Text style={styles.subtleText}>No resources found.</Text>
+        ) : (
+          <View style={styles.grid}>
+            {filtered.map((item) => (
+              <TouchableOpacity
+                key={item.rid}
+                style={styles.card}
+                activeOpacity={0.7}
+                onPress={() => handlePress(item)}
+              >
+                <Text style={styles.cardTitle} numberOfLines={2}>
+                  {item.title}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Recently Saved section */}
 				{recentlySaved.length > 0 && (
 					<>
 						<Text
@@ -243,6 +297,13 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 
+  // Filter icon container
+  filterBtn: {
+    marginLeft: 8,
+    padding: 6,
+    borderRadius: 999,
+  },
+    
 	// Sections
 	sectionLabel: {
 		color: 'rgba(255,255,255,0.75)',

@@ -22,18 +22,17 @@ export const unstable_settings = {
 export default function RootLayout() {
 	const colorScheme = useColorScheme();
 
-	return (
-		<ThemeProvider
-			value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-		>
-			<Stack>
-				<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-				<Stack.Screen
-					name="modal"
-					options={{ presentation: 'modal', title: 'Modal' }}
-				/>
-			</Stack>
-			<StatusBar style="auto" />
-		</ThemeProvider>
-	);
+  return (
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+        {/* Search-only filter screen (opened from the Search tab) */}
+        <Stack.Screen name="filter" options={{ presentation: 'modal', headerShown: false }}/>
+
+        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+      </Stack>
+      <StatusBar style="auto" />
+    </ThemeProvider>
+  );
 }
