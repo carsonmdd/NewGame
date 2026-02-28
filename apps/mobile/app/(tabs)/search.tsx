@@ -94,34 +94,40 @@ export default function SearchScreen() {
 					</View>
 				</View>
 
-				{/* Search bar row */}
-				<View style={styles.searchRow}>
-					<View style={styles.searchBar}>
-						<Ionicons
-							name="search"
-							size={18}
-							color="rgba(255,255,255,0.85)"
-							style={styles.searchIcon}
-						/>
-						<TextInput
-							style={styles.searchInput}
-							placeholder="Guides, videos, tutorials, and more"
-							placeholderTextColor="rgba(255,255,255,0.55)"
-							value={query}
-							onChangeText={setQuery}
-							returnKeyType="search"
-						/>
-					</View>
+				{/* Search bar */}
+				<View style={styles.searchBar}>
+					<Ionicons
+						name="search"
+						size={18}
+						color="#F9FAFB"
+						style={styles.searchIcon}
+					/>
+					<TextInput
+						style={styles.searchInput}
+						placeholder="Search"
+						placeholderTextColor="#E5E7EB"
+						value={query}
+						onChangeText={setQuery}
+						returnKeyType="search"
+					/>
 
-					<View style={styles.filterBtn}>
+					{/*  Filter button (routes to /filter). */}
+					<TouchableOpacity
+						accessibilityRole="button"
+						accessibilityLabel="Open filters"
+						activeOpacity={0.7}
+						style={styles.filterBtn}
+						onPress={() => router.push('../filter')}
+					>
 						<Ionicons
 							name="options-outline"
-							size={20}
-							color="#111"
+							size={18}
+							color="#F9FAFB"
 						/>
-					</View>
+					</TouchableOpacity>
 				</View>
 
+				{/* Search section */}
 				{loading && filtered.length === 0 ? (
 					<Text style={styles.subtleText}>Loading resources…</Text>
 				) : filtered.length === 0 ? (
@@ -132,12 +138,12 @@ export default function SearchScreen() {
 							<TouchableOpacity
 								key={item.rid}
 								style={styles.card}
-								activeOpacity={0.85}
+								activeOpacity={0.7}
 								onPress={() => handlePress(item)}
 							>
 								<Text
 									style={styles.cardTitle}
-									numberOfLines={3}
+									numberOfLines={2}
 								>
 									{item.title}
 								</Text>
@@ -146,58 +152,7 @@ export default function SearchScreen() {
 					</View>
 				)}
 
-        {/* Search bar */}
-        <View style={styles.searchBar}>
-          <Ionicons
-            name="search"
-            size={18}
-            color="#F9FAFB"
-            style={styles.searchIcon}
-          />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search"
-            placeholderTextColor="#E5E7EB"
-            value={query}
-            onChangeText={setQuery}
-            returnKeyType="search"
-          />
-
-          {/*  Filter button (routes to /filter). */}
-          <TouchableOpacity
-            accessibilityRole="button"
-            accessibilityLabel="Open filters"
-            activeOpacity={0.7}
-            style={styles.filterBtn}
-            onPress={() => router.push('../filter')}
-          >
-            <Ionicons name="options-outline" size={18} color="#F9FAFB" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Search section */}
-        {loading && filtered.length === 0 ? (
-          <Text style={styles.subtleText}>Loading resources…</Text>
-        ) : filtered.length === 0 ? (
-          <Text style={styles.subtleText}>No resources found.</Text>
-        ) : (
-          <View style={styles.grid}>
-            {filtered.map((item) => (
-              <TouchableOpacity
-                key={item.rid}
-                style={styles.card}
-                activeOpacity={0.7}
-                onPress={() => handlePress(item)}
-              >
-                <Text style={styles.cardTitle} numberOfLines={2}>
-                  {item.title}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-
-        {/* Recently Saved section */}
+				{/* Recently Saved section */}
 				{recentlySaved.length > 0 && (
 					<>
 						<Text
@@ -297,13 +252,13 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 
-  // Filter icon container
-  filterBtn: {
-    marginLeft: 8,
-    padding: 6,
-    borderRadius: 999,
-  },
-    
+	// Filter icon container
+	filterBtn: {
+		marginLeft: 8,
+		padding: 6,
+		borderRadius: 999,
+	},
+
 	// Sections
 	sectionLabel: {
 		color: 'rgba(255,255,255,0.75)',
