@@ -6,8 +6,14 @@ import {
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
-
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { liteClient as algoliasearch } from 'algoliasearch/lite';
+import { InstantSearch } from 'react-instantsearch-core';
+
+const searchClient = algoliasearch(
+	process.env.EXPO_PUBLIC_ALGOLIA_APP_ID || '',
+	process.env.EXPO_PUBLIC_ALGOLIA_SEARCH_API_KEY || '',
+);
 
 export const unstable_settings = {
 	anchor: '(tabs)',

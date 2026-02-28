@@ -9,6 +9,7 @@ export interface Resource {
 	tags: string[];
 	difficulty: "beginner" | "intermediate" | "advanced";
 	createdAt: string;
+	saveCount: number;
 }
 
 export type ResourceInput = Omit<Resource, "pk" | "sk" | "id" | "createdAt">;

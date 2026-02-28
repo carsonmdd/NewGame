@@ -8,36 +8,47 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+	const colorScheme = useColorScheme();
 
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: 'Search',
-          tabBarIcon: ({ color }) => <Feather name="search" size={24} color="white" />,
-        }}
-      />
-      <Tabs.Screen
-        name="saved"
-        options={{
-          title: 'Saved',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="bookmark.fill" color={color} />,
-        }}
-      />
-    </Tabs>
-  );
+	return (
+		<Tabs
+			screenOptions={{
+				tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+				headerShown: false,
+				tabBarButton: HapticTab,
+			}}
+		>
+			<Tabs.Screen
+				name="index"
+				options={{
+					title: 'Home',
+					tabBarIcon: ({ color }) => (
+						<IconSymbol size={28} name="house.fill" color={color} />
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name="search"
+				options={{
+					title: 'Search',
+					tabBarIcon: ({ color }) => (
+						<Feather size={28} name="search" color={color} />
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name="saved"
+				options={{
+					title: 'Saved',
+					tabBarIcon: ({ color }) => (
+						<IconSymbol
+							size={28}
+							name="bookmark.fill"
+							color={color}
+						/>
+					),
+				}}
+			/>
+		</Tabs>
+	);
 }
