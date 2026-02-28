@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Asset } from 'expo-asset';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
 	Alert,
