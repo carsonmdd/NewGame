@@ -3,7 +3,7 @@ import { Resource, ResourceInput } from '@/types/resource';
 
 const api = axios.create({
 	baseURL:
-		process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api',
+		process.env.NEXT_PUBLIC_API_BASE_URL || 'https://ux6ou7lc8f.execute-api.us-east-1.amazonaws.com/dev\n',
 });
 
 interface ApiResponse<T> {
