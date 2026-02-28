@@ -7,9 +7,7 @@ import ResourceForm from "@/components/ResourceForm";
 import { useResourceCSV } from "@/hooks/useResourceCSV";
 import CSVToolbar from "./CSVToolbar";
 
-type Props = {};
-
-const AdminDashboard = (props: Props) => {
+const AdminDashboard = () => {
 	const [resources, setResources] = useState<Resource[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
@@ -41,13 +39,9 @@ const AdminDashboard = (props: Props) => {
 	const handleCreateOrUpdate = async (input: ResourceInput) => {
 		try {
 			if (editingResource === "new") {
-				await resourceApi.create(input);
+				await resourceApi.create({ items: [input] });
 			} else if (editingResource) {
-				await resourceApi.update(
-					editingResource.pk,
-					editingResource.sk,
-					input,
-				);
+				await resourceApi.update(editingResource.sk, input);
 			}
 			setEditingResource(null);
 			loadResources();
@@ -61,7 +55,7 @@ const AdminDashboard = (props: Props) => {
 			return;
 
 		try {
-			await resourceApi.delete(resource.pk, resource.sk);
+			await resourceApi.delete(resource.sk);
 
 			loadResources();
 		} catch (err) {
@@ -91,7 +85,11 @@ const AdminDashboard = (props: Props) => {
 						initialData={
 							editingResource === "new"
 								? undefined
-								: editingResource
+								: (() => {
+										const { pk, sk, id, ...data } =
+											editingResource;
+										return data;
+									})()
 						}
 						onSubmit={handleCreateOrUpdate}
 						onCancel={() => setEditingResource(null)}

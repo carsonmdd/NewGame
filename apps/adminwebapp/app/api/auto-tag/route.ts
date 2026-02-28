@@ -7,6 +7,17 @@ import { NextResponse } from "next/server";
 
 const TAG_OPTIONS = ["Blue", "Red", "Green", "Cat", "Dog", "Bird"] as const;
 
+function stripJsonFences(s: string) {
+  const trimmed = (s ?? "").trim();
+  if (trimmed.startsWith("```")) {
+    return trimmed
+      .replace(/^```[a-zA-Z]*\n?/, "")
+      .replace(/```$/, "")
+      .trim();
+  }
+  return trimmed;
+}
+
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -38,9 +49,13 @@ export async function POST(req: Request) {
     `;
 
     const resp = await client.responses.create({
-      model: "gpt-4.1-mini",
-      input: prompt,
-    });
+  model: "gpt-4.1-mini",
+  input: prompt,
+  text: {
+    format: { type: "json_object" },
+  },
+});
+
 
     // resp.output_text should be a JSON string per the prompt
     const text = resp.output_text.trim();
@@ -58,8 +73,6 @@ export async function POST(req: Request) {
       {
         error: "Auto-tag failed",
         message: err?.message ?? String(err),
-        name: err?.name,
-        stack: err?.stack,
       },
       { status: 500 }
     );
