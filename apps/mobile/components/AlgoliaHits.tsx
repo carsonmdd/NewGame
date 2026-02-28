@@ -1,10 +1,17 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert, Image} from 'react-native';
 import { useHits, UseHitsProps } from 'react-instantsearch-core';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+
 import { Resource } from '@/types/resource';
+import { handleResourcePress } from '@/utils/resourceAction';
+import { getKind, getStableId, isYouTubeUrl, getYouTubeThumb } from '@/utils/resourceRender';
+
 
 export function AlgoliaHits(props: UseHitsProps<Resource>) {
 	const { hits } = useHits(props);
+  	const router = useRouter();
 
 	const handlePress = (item: Resource) => {
 		Alert.alert(item.title, item.description);
@@ -16,18 +23,38 @@ export function AlgoliaHits(props: UseHitsProps<Resource>) {
 
 	return (
 		<View style={styles.grid}>
-			{hits.map((item) => (
-				<TouchableOpacity
-					key={item.id}
-					style={styles.card}
-					activeOpacity={0.7}
-					onPress={() => handlePress(item)}
-				>
-					<Text style={styles.cardTitle} numberOfLines={2}>
-						{item.title}
-					</Text>
-				</TouchableOpacity>
-			))}
+		{hits.map((item) => {
+			const kind = getKind(item);
+			const key = getStableId(item);
+
+			const thumb =
+			kind === 'VIDEO' && item.url && isYouTubeUrl(item.url)
+				? getYouTubeThumb(item.url)
+				: null;
+
+			return (
+			<TouchableOpacity
+				key={key}
+				style={styles.card}
+				activeOpacity={0.7}
+				onPress={() => handleResourcePress(router, item)}
+			>
+				{thumb ? <Image source={{ uri: thumb }} style={styles.thumb} /> : null}
+
+				<View style={styles.iconBadge}>
+				{kind === 'IN_APP' && <Ionicons name="document-text" size={16} color="#fff" />}
+				{kind === 'PDF' && <Ionicons name="document" size={16} color="#fff" />}
+				{kind === 'AUDIO' && <Ionicons name="play" size={16} color="#fff" />}
+				{kind === 'VIDEO' && <Ionicons name="logo-youtube" size={16} color="#fff" />}
+				{kind === 'LINK' && <Ionicons name="open-outline" size={16} color="#fff" />}
+				</View>
+
+				<Text style={styles.cardTitle} numberOfLines={2}>
+				{item.title}
+				</Text>
+			</TouchableOpacity>
+			);
+		})}
 		</View>
 	);
 }
