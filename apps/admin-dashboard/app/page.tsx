@@ -6,6 +6,8 @@ import { Resource, ResourceInput } from '@/types/resource';
 import ResourceForm from '@/components/ResourceForm';
 import Sidebar from '@/components/Sidebar';
 import ResourceCard from '@/components/ResourceCard';
+import CSVToolbar from '@/components/CSVToolbar';
+import { useResourceCSV } from '@/hooks/useResourceCSV';
 
 type TabKey = 'database' | 'review' | 'stats' | 'notifications';
 type OpenDropdown = null | 'newest' | 'language' | 'tags';
@@ -43,6 +45,11 @@ export default function Home() {
 			setLoading(false);
 		}
 	};
+
+	const { handleExport, handleImport } = useResourceCSV(
+		resources,
+		loadResources,
+	);
 
 	useEffect(() => {
 		loadResources();
@@ -179,8 +186,8 @@ export default function Home() {
 
 					{activeTab === 'database' && (
 						<div className="max-w-6xl mx-auto" ref={dropdownWrapperRef}>
-							<div className="flex items-center gap-4">
-								<div className="flex-1">
+							<div className="flex items-center gap-4 flex-wrap">
+								<div className="flex-1 min-w-[320px]">
 									<div className="flex items-center gap-3 bg-white border rounded-2xl px-4 py-3 shadow-sm">
 										<span
 											className="text-slate-500"
@@ -207,6 +214,11 @@ export default function Home() {
 										</button>
 									</div>
 								</div>
+
+								<CSVToolbar
+									onExport={handleExport}
+									onImport={handleImport}
+								/>
 
 								<button
 									type="button"
