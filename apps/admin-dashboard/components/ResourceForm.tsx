@@ -1,30 +1,24 @@
 "use client";
-import { useMemo, useState } from "react";
-import { ResourceInput } from "@/types/resource";
-import OpenAI from "openai";
+
+import { useState } from "react";
+import { Resource, ResourceInput } from "@/types/resource";
 
 interface Props {
 	initialData?: ResourceInput;
+	resource?: Resource | null;
+	isEditing?: boolean;
 	onSubmit: (data: ResourceInput) => void;
 	onCancel: () => void;
+	onDelete?: () => void;
 }
-
-const openai = new OpenAI({
-	apiKey: "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",
-	dangerouslyAllowBrowser: true,
-});
-
-// Add tags in
-const TAG_OPTIONS = ["Blue", "Red", "Green", "Cat", "Dog", "Bird"] as const;
-
-type TagOption = (typeof TAG_OPTIONS)[number];
 
 export default function ResourceForm({
 	initialData,
+	resource,
 	onSubmit,
 	onCancel,
+	onDelete,
 }: Props) {
-	// 1. Define your default "Empty" state for new resources
 	const defaults: ResourceInput = {
 		title: "",
 		description: "",
@@ -35,33 +29,47 @@ export default function ResourceForm({
 		saveCount: 0,
 	};
 
-	// 2. Initialize state by merging defaults with whatever initialData actually contains
 	const [formData, setFormData] = useState<ResourceInput>({
 		...defaults,
 		...(initialData || {}),
 	});
 
-	// Optional: quick filter/search for tag list
-	const [tagQuery, setTagQuery] = useState("");
+	const [tagInput, setTagInput] = useState("");
+	const [showTagInput, setShowTagInput] = useState(
+		(initialData?.tags?.length ?? 0) === 0,
+	);
 
-	// Can add evidence tagging for console if needed
-	const [autoTagLoading, setAutoTagLoading] = useState(false);
-	const [autoTagEvidence, setAutoTagEvidence] = useState<string[]>([]);
-
-	const filteredTags = useMemo(() => {
-		const q = tagQuery.trim().toLowerCase();
-		if (!q) return TAG_OPTIONS;
-		return TAG_OPTIONS.filter((t) => t.toLowerCase().includes(q));
-	}, [tagQuery]);
-
-	const toggleTag = (tag: TagOption) => {
-		setFormData((prev) => {
-			const exists = prev.tags.includes(tag);
-			const nextTags = exists
-				? prev.tags.filter((t) => t !== tag)
-				: [...prev.tags, tag];
-			return { ...prev, tags: nextTags };
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		onSubmit({
+			...formData,
+			title: formData.title.trim(),
+			url: formData.url.trim(),
+			description: formData.description.trim(),
 		});
+	};
+
+	const addTag = () => {
+		if (!showTagInput) {
+			setShowTagInput(true);
+			return;
+		}
+
+		const trimmed = tagInput.trim();
+		if (!trimmed) return;
+
+		if (formData.tags.includes(trimmed)) {
+			setTagInput("");
+			setShowTagInput(false);
+			return;
+		}
+
+		setFormData((prev) => ({
+			...prev,
+			tags: [...prev.tags, trimmed],
+		}));
+		setTagInput("");
+		setShowTagInput(false);
 	};
 
 	const removeTag = (tag: string) => {
@@ -71,230 +79,160 @@ export default function ResourceForm({
 		}));
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		onSubmit({ ...formData, url: formData.url.trim() });
+	const formatDate = (value?: string) => {
+		if (!value) return "";
+		const date = new Date(value);
+		if (Number.isNaN(date.getTime())) return "";
+		return date.toLocaleDateString();
 	};
 
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className='p-6 border border-gray-200 rounded-lg bg-white space-y-4 shadow-sm text-slate-900'
+			className="relative w-full rounded-[26px] border-2 border-[#2D9CFF] bg-white px-12 pb-10 pt-10 shadow-xl text-[#222222]"
 		>
-			<h3 className='font-bold text-lg border-b pb-2'>
-				{initialData ? "Edit Resource" : "Create New Resource"}
-			</h3>
+			<button
+				type="button"
+				onClick={onCancel}
+				className="absolute right-6 top-4 text-[34px] leading-none text-black hover:opacity-70"
+				aria-label="Close"
+				title="Close"
+			>
+				✕
+			</button>
 
-			<div className='space-y-1'>
-				<label className='text-xs font-bold uppercase text-gray-500'>
-					Title
-				</label>
-				<input
-					className='w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none'
-					placeholder='e.g. Unity Physics Tutorial'
-					value={formData.title}
-					onChange={(e) =>
-						setFormData({ ...formData, title: e.target.value })
-					}
-					required
-				/>
-			</div>
+			<button
+				type="submit"
+				className="absolute right-10 top-[88px] flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#E8DDF4] text-[34px] leading-none text-black hover:opacity-80"
+				aria-label="Save"
+				title="Save"
+			>
+				+
+			</button>
 
-			<div className='space-y-1'>
-				<label className='text-xs font-bold uppercase text-gray-500'>
-					Resource URL
-				</label>
-				<input
-					type='url'
-					className='w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none'
-					placeholder='https://youtube.com/watch?v=...'
-					value={formData.url}
-					onChange={(e) =>
-						setFormData({ ...formData, url: e.target.value })
-					}
-					required
-				/>
-			</div>
-
-			<div className='space-y-1'>
-				<label className='text-xs font-bold uppercase text-gray-500'>
-					Description
-				</label>
-				<textarea
-					className='w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none'
-					placeholder='Briefly explain what this resource covers...'
-					value={formData.description}
-					onChange={(e) =>
-						setFormData({
-							...formData,
-							description: e.target.value,
-						})
-					}
-				/>
-			</div>
-
-			<div className='grid grid-cols-2 gap-4'>
-				<div className='space-y-1'>
-					<label className='text-xs font-bold uppercase text-gray-500'>
-						Type
+			<div className="space-y-7 pr-24">
+				<div>
+					<label className="mb-3 block text-[19px] font-normal">
+						Resource title:
 					</label>
-					<select
-						className='w-full p-2 border border-gray-300 rounded outline-none bg-white'
-						value={formData.resourceType}
-						onChange={(e) =>
-							setFormData({
-								...formData,
-								resourceType: e.target.value as any,
-							})
-						}
-					>
-						<option value='video'>Video</option>
-						<option value='guide'>Guide</option>
-						<option value='audio'>Audio</option>
-						<option value='model'>Model</option>
-						<option value='texture'>Texture</option>
-						<option value='script'>Script</option>
-					</select>
-				</div>
-
-				<div className='space-y-1'>
-					<label className='text-xs font-bold uppercase text-gray-500'>
-						Difficulty
-					</label>
-					<select
-						className='w-full p-2 border border-gray-300 rounded outline-none bg-white'
-						value={formData.difficulty || "beginner"}
-						onChange={(e) =>
-							setFormData({
-								...formData,
-								difficulty: e.target.value as any,
-							})
-						}
-					>
-						<option value='beginner'>Beginner</option>
-						<option value='intermediate'>Intermediate</option>
-						<option value='advanced'>Advanced</option>
-					</select>
-				</div>
-			</div>
-
-			{/* Tags section */}
-			<div className='space-y-2'>
-				<div className='flex items-center justify-between gap-3'>
-					<label className='text-xs font-bold uppercase text-gray-500'>
-						Tags
-					</label>
-
-					{/* Optional search box for tags */}
 					<input
-						className='w-56 p-2 border border-gray-300 rounded outline-none text-sm'
-						placeholder='Search tags…'
-						value={tagQuery}
-						onChange={(e) => setTagQuery(e.target.value)}
+						value={formData.title}
+						onChange={(e) =>
+							setFormData({ ...formData, title: e.target.value })
+						}
+						className="h-[44px] w-full rounded-[14px] bg-[#D9D9D9] px-5 outline-none"
+						required
 					/>
 				</div>
 
-				{/* Selected tags as chips */}
-				{formData.tags.length > 0 && (
-					<div className='flex flex-wrap gap-2'>
+				<div>
+					<label className="mb-3 block text-[19px] font-normal">
+						Resource url:
+					</label>
+					<input
+						type="url"
+						value={formData.url}
+						onChange={(e) =>
+							setFormData({ ...formData, url: e.target.value })
+						}
+						className="h-[44px] w-full rounded-[14px] bg-[#D9D9D9] px-5 outline-none"
+						required
+					/>
+				</div>
+
+				<div>
+					<label className="mb-3 block text-[19px] font-normal">
+						Description:
+					</label>
+					<textarea
+						value={formData.description}
+						onChange={(e) =>
+							setFormData({
+								...formData,
+								description: e.target.value,
+							})
+						}
+						rows={6}
+						className="min-h-[170px] w-full resize-none rounded-[18px] bg-[#D9D9D9] px-5 py-4 outline-none"
+					/>
+				</div>
+
+				<div>
+					<label className="mb-3 block text-[19px] font-normal">
+						Tags:
+					</label>
+
+					<div className="flex flex-wrap items-center gap-3">
 						{formData.tags.map((tag) => (
 							<button
 								key={tag}
-								type='button'
+								type="button"
 								onClick={() => removeTag(tag)}
-								className='px-3 py-1 rounded-full border text-sm bg-gray-50 hover:bg-gray-100'
-								title='Remove tag'
+								className="rounded-full bg-[#D9D9D9] px-4 py-2 text-[16px] text-[#444444] hover:opacity-80"
+								title="Remove tag"
 							>
-								#{tag}{" "}
-								<span className='ml-1 text-gray-500'>×</span>
+								{tag}
 							</button>
 						))}
-					</div>
-				)}
 
-				{/* Tag options */}
-				<div className='flex flex-wrap gap-2 p-3 border border-gray-200 rounded'>
-					{filteredTags.map((tag) => {
-						const selected = formData.tags.includes(tag);
-						return (
-							<label
-								key={tag}
-								className={`px-3 py-1 rounded-full border text-sm cursor-pointer select-none transition-colors ${
-									selected
-										? "bg-blue-600 text-white border-blue-600"
-										: "bg-white hover:bg-gray-50"
-								}`}
-							>
-								<input
-									type='checkbox'
-									className='hidden'
-									checked={selected}
-									onChange={() => toggleTag(tag)}
-								/>
-								#{tag}
-							</label>
-						);
-					})}
+						{showTagInput && (
+							<input
+								value={tagInput}
+								onChange={(e) => setTagInput(e.target.value)}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") {
+										e.preventDefault();
+										addTag();
+									}
+								}}
+								placeholder="Text"
+								autoFocus
+								className="h-[40px] w-[170px] rounded-full bg-[#D9D9D9] px-4 outline-none"
+							/>
+						)}
+
+						<button
+							type="button"
+							onClick={addTag}
+							className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#D9D9D9] text-[28px] leading-none text-black hover:opacity-80"
+							aria-label="Add tag"
+							title="Add tag"
+						>
+							+
+						</button>
+					</div>
 				</div>
 			</div>
 
-			{/* Auto Tag Button */}
-			<button
-				type='button'
-				disabled={autoTagLoading}
-				onClick={async () => {
-					try {
-						setAutoTagLoading(true);
-						setAutoTagEvidence([]);
+			<div className="mt-10 grid grid-cols-3 gap-10 text-left">
+				<div>
+					<p className="mb-3 text-[18px]">Number of saves:</p>
+					<div className="h-[34px] w-[150px] rounded-[12px] bg-[#D9D9D9] px-4 py-1 text-[16px]">
+						{resource?.saveCount ?? formData.saveCount ?? 0}
+					</div>
+				</div>
 
-						const res = await fetch("/api/auto-tag", {
-							method: "POST",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({
-								title: formData.title,
-								description: formData.description,
-								url: formData.url,
-								resourceType: formData.resourceType,
-							}),
-						});
+				<div>
+					<p className="mb-3 text-[18px]">Date created:</p>
+					<div className="h-[34px] w-[150px] rounded-[12px] bg-[#D9D9D9] px-4 py-1 text-[16px]">
+						{formatDate(resource?.createdAt)}
+					</div>
+				</div>
 
-						if (!res.ok) {
-							const txt = await res.text();
-							throw new Error(`HTTP ${res.status} - ${txt}`);
-						}
+				<div>
+					<p className="mb-3 text-[18px]">Date last updated:</p>
+					<div className="h-[34px] w-[150px] rounded-[12px] bg-[#D9D9D9] px-4 py-1 text-[16px]">
+						—
+					</div>
+				</div>
+			</div>
 
-						const data: { tags: string[]; evidence: string[] } =
-							await res.json();
-
-						// Overwrite tags with AI result (or merge if you prefer)
-						setFormData((prev) => ({ ...prev, tags: data.tags }));
-						setAutoTagEvidence(data.evidence ?? []);
-					} catch (e: any) {
-						alert(`Auto tag failed: ${e?.message ?? e}`);
-					} finally {
-						setAutoTagLoading(false);
-					}
-				}}
-				className='bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded text-sm font-medium transition disabled:opacity-60'
-			>
-				{autoTagLoading ? "Tagging..." : "Auto Tag"}
-			</button>
-
-			{/* Save and Cancel Buttons */}
-			<div className='flex gap-2 pt-4'>
+			<div className="mt-8">
 				<button
-					type='submit'
-					className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-medium transition-colors hover:cursor-pointer'
+					type="button"
+					onClick={onDelete}
+					className="text-[18px] text-red-500 underline hover:opacity-80"
 				>
-					Save Resource
-				</button>
-
-				<button
-					type='button'
-					onClick={onCancel}
-					className='bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded font-medium transition-colors hover:cursor-pointer'
-				>
-					Cancel
 				</button>
 			</div>
 		</form>

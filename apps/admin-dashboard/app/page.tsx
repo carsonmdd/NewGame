@@ -456,7 +456,7 @@ export default function Home() {
 
 							{editingResource && (
 								<div className="fixed inset-0 bg-black/40 flex items-center justify-center p-6 z-50">
-									<div className="w-full max-w-2xl">
+									<div className="w-full max-w-4xl">
 										<ResourceForm
 											initialData={
 												editingResource === 'new'
@@ -466,14 +466,33 @@ export default function Home() {
 																pk,
 																sk,
 																id,
+																createdAt,
 																...data
 															} = editingResource;
 															return data;
 														})()
 											}
+											resource={
+												editingResource === 'new'
+													? null
+													: editingResource
+											}
+											isEditing={editingResource !== 'new'}
 											onSubmit={handleCreateOrUpdate}
 											onCancel={() =>
 												setEditingResource(null)
+											}
+											onDelete={
+												editingResource !== 'new'
+													? async () => {
+															await handleDelete(
+																editingResource,
+															);
+															setEditingResource(
+																null,
+															);
+														}
+													: undefined
 											}
 										/>
 									</div>
