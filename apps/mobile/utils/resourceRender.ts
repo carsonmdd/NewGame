@@ -1,27 +1,21 @@
 import { Resource, ResourceCategory } from '@/types/resource';
 
-export type Kind = 'IN_APP' | 'VIDEO' | 'PDF' | 'AUDIO' | 'LINK';
+export type ResourceDisplayKind = 'TEXT' | 'IMAGE' | 'PDF' | 'AUDIO' | 'VIDEO' | 'LINK';
 
+const IMAGE_EXTS = ['.png', '.jpg', '.jpeg', '.webp', '.gif'];
 const AUDIO_EXTS = ['.mp3', '.wav', '.m4a', '.aac', '.ogg'];
 
 export const isPdfUrl = (url: string) =>
   url.toLowerCase().split('?')[0].endsWith('.pdf');
 
 export const isAudioUrl = (url: string) =>
-  AUDIO_EXTS.some((e) => url.toLowerCase().includes(e));
+  AUDIO_EXTS.some((ext) => url.toLowerCase().includes(ext));
 
-export const isYouTubeUrl = (url: string) => /youtu\.be|youtube\.com/.test(url);
+export const isImageUrl = (url: string) =>
+  IMAGE_EXTS.some((ext) => url.toLowerCase().includes(ext));
 
-export function getKind(item: Resource): Kind {
-  const url = (item.url ?? '').trim();
-  if (url) {
-    if (isPdfUrl(url)) return 'PDF';
-    if (isAudioUrl(url)) return 'AUDIO';
-  }
-  if (item.resourceType === ResourceCategory.VIDEO) return 'VIDEO';
-  if (url) return 'LINK';
-  return 'IN_APP';
-}
+export const isYouTubeUrl = (url: string) =>
+  /youtu\.be|youtube\.com/.test(url);
 
 export function getYouTubeId(url: string) {
   try {
@@ -29,9 +23,6 @@ export function getYouTubeId(url: string) {
     if (u.hostname.includes('youtu.be')) return u.pathname.replace('/', '');
     const v = u.searchParams.get('v');
     if (v) return v;
-    const parts = u.pathname.split('/');
-    const embedIdx = parts.indexOf('embed');
-    if (embedIdx >= 0 && parts[embedIdx + 1]) return parts[embedIdx + 1];
   } catch {}
   return null;
 }
@@ -41,7 +32,20 @@ export function getYouTubeThumb(url: string) {
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
 }
 
+export function getDisplayKind(item: Resource): ResourceDisplayKind {
+  const url = (item.url ?? '').trim();
+
+  if (url) {
+    if (isImageUrl(url)) return 'IMAGE';
+    if (isPdfUrl(url)) return 'PDF';
+    if (isAudioUrl(url)) return 'AUDIO';
+  }
+
+  if (item.resourceType === ResourceCategory.VIDEO) return 'VIDEO';
+  if (url) return 'LINK';
+  return 'TEXT';
+}
+
 export function getStableId(item: Resource) {
-  // Algolia gives objectID; you also have id
   return item.objectID || item.id;
 }

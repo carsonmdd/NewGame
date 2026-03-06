@@ -1,4 +1,6 @@
-import React from 'react';
+import { SavedResourcesProvider } from '@/contexts/SavedResourcesContext';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { INDEX_NAME, searchClient } from '@/lib/algolia';
 import {
 	DarkTheme,
 	DefaultTheme,
@@ -6,10 +8,9 @@ import {
 } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { searchClient, INDEX_NAME } from '@/lib/algolia';
+import React from 'react';
 import { InstantSearch } from 'react-instantsearch-core';
+import 'react-native-reanimated';
 
 export const unstable_settings = {
 	anchor: '(tabs)',
@@ -23,6 +24,7 @@ export default function RootLayout() {
 			value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
 		>
 			<InstantSearch searchClient={searchClient} indexName={INDEX_NAME}>
+				<SavedResourcesProvider>
 				<Stack>
 					<Stack.Screen
 						name="(tabs)"
@@ -39,7 +41,13 @@ export default function RootLayout() {
 						name="modal"
 						options={{ presentation: 'modal', title: 'Modal' }}
 					/>
+
+					<Stack.Screen 
+						name="resource/[id]" 
+						options={{ headerShown: false }} 
+					/>
 				</Stack>
+				</SavedResourcesProvider>
 			</InstantSearch>
 			<StatusBar style="auto" />
 		</ThemeProvider>
