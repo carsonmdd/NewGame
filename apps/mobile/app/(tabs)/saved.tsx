@@ -242,7 +242,12 @@ export default function SavedScreen() {
             <View style={styles.modalContainer}>
               <View style={styles.modalHeader}>
                 <View style={styles.modalTitleRow}>
-                  {!isEditingTitle ? (
+                  {/* If default collection → not editable */}
+                  {openCollection?.id === 'recent' ? (
+                    <Text style={styles.modalTitle}>
+                      {openCollectionName}
+                    </Text>
+                  ) : !isEditingTitle ? (
                     <TouchableOpacity
                       activeOpacity={0.8}
                       onPress={startEditingTitle}
@@ -276,15 +281,18 @@ export default function SavedScreen() {
                 </View>
 
                 <View style={styles.modalHeaderBtns}>
-                  <TouchableOpacity
-                    accessibilityRole="button"
-                    accessibilityLabel="Delete collection"
-                    activeOpacity={0.8}
-                    onPress={deleteCollection}
-                    style={styles.iconBtn}
-                  >
-                    <Ionicons name="trash-outline" size={22} color={TEXT} />
-                  </TouchableOpacity>
+                  {/* Only show trash if NOT default */}
+                  {openCollection?.id !== 'recent' && (
+                    <TouchableOpacity
+                      accessibilityRole="button"
+                      accessibilityLabel="Delete collection"
+                      activeOpacity={0.8}
+                      onPress={deleteCollection}
+                      style={styles.iconBtn}
+                    >
+                      <Ionicons name="trash-outline" size={22} color={TEXT} />
+                    </TouchableOpacity>
+                  )}
 
                   <TouchableOpacity
                     accessibilityRole="button"

@@ -5,9 +5,15 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AlgoliaSearchBox } from '@/components/AlgoliaSearchBox';
 import { AlgoliaHits } from '@/components/AlgoliaHits';
 
+import { AlgoliaFilterWidgets } from '@/components/AlgoliaFilterWidgets';
+
 export default function SearchScreen() {
 	return (
 		<View style={styles.container}>
+
+			{/* Keep Filters Updated */}
+			<AlgoliaFilterWidgets />
+
 			<ScrollView
 				contentContainerStyle={styles.scrollContent}
 				showsVerticalScrollIndicator={false}

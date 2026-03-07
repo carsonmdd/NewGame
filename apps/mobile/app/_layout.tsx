@@ -23,7 +23,9 @@ export default function RootLayout() {
 		<ThemeProvider
 			value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
 		>
-			<InstantSearch searchClient={searchClient} indexName={INDEX_NAME}>
+			<InstantSearch searchClient={searchClient} indexName={INDEX_NAME} 
+				future={{ preserveSharedStateOnUnmount: true }}
+			>
 				<SavedResourcesProvider>
 				<Stack>
 					<Stack.Screen
