@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useSavedResources } from '@/contexts/SavedResourcesContext';
 import { Resource } from '@/types/resource';
@@ -43,6 +43,8 @@ const TILE_BG = '#1B1B22';
 const NAME_MAX = 22;
 
 export default function SavedScreen() {
+  const insets = useSafeAreaInsets();
+
   const router = useRouter();
   const { savedResources } = useSavedResources();
 
@@ -179,12 +181,12 @@ export default function SavedScreen() {
   }, [openCollection, filteredSavedResources]);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
-      <View style={styles.container}>
+    <SafeAreaView style={styles.safe} edges={[ 'left', 'right']}>
+      <View style={[styles.container, { paddingTop: insets.top }]} >
         <View style={styles.headerRow}>
           <Text style={styles.headerTitle}>Saved</Text>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>👨‍💻</Text>
+          <View style={styles.avatarCircle}>
+            <Ionicons name="person" size={18} color="#111" />
           </View>
         </View>
 
@@ -238,8 +240,8 @@ export default function SavedScreen() {
           presentationStyle="fullScreen"
           onRequestClose={closeModal}
         >
-          <SafeAreaView style={styles.modalSafe} edges={['top', 'left', 'right']}>
-            <View style={styles.modalContainer}>
+          <SafeAreaView style={styles.modalSafe} edges={['bottom', 'left', 'right']}>
+            <View style={[styles.modalContainer, { paddingTop: insets.top }]}>
               <View style={styles.modalHeader}>
                 <View style={styles.modalTitleRow}>
                   {/* If default collection → not editable */}
@@ -423,34 +425,37 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 6,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  marginBottom: 6,
+  marginTop: 2,
   },
   headerTitle: {
-    color: TEXT,
-    fontSize: 44,
-    fontWeight: '800',
-    letterSpacing: 0.2,
+  color: TEXT,
+  fontSize: 32,
+  fontWeight: '800',
+  letterSpacing: 0.2,
+  lineHeight: 38,
   },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 999,
-    backgroundColor: TILE_BG,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  avatarCircle: {
+		width: 36,
+		height: 36,
+		borderRadius: 18,
+		backgroundColor: '#E9F1FF',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
   avatarText: {
     fontSize: 18,
   },
   sectionTitle: {
-    color: TEXT,
-    fontSize: 40,
-    fontWeight: '800',
-    marginTop: 0,
-    marginBottom: 12,
+  color: TEXT,
+  fontSize: 30,
+  fontWeight: '800',
+  marginTop: 0,
+  marginBottom: 12,
+  lineHeight: 36,
   },
   gridContent: {
     paddingBottom: 24,
@@ -501,12 +506,12 @@ const styles = StyleSheet.create({
     backgroundColor: BG,
   },
   modalHeader: {
-    paddingHorizontal: 20,
-    paddingTop: 6,
-    paddingBottom: 8,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
+  paddingHorizontal: 20,
+  paddingTop: 4,
+  paddingBottom: 10,
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  justifyContent: 'space-between',
   },
   modalTitleRow: {
     flex: 1,
@@ -516,19 +521,21 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   modalTitle: {
-    color: TEXT,
-    fontSize: 38,
-    fontWeight: '800',
-  },
+  color: TEXT,
+  fontSize: 30,
+  fontWeight: '800',
+  lineHeight: 36,
+},
   modalTitleEditWrap: {
     paddingTop: 2,
   },
   modalTitleInput: {
-    color: TEXT,
-    fontSize: 34,
-    fontWeight: '800',
-    paddingVertical: 6,
-    paddingHorizontal: 0,
+  color: TEXT,
+  fontSize: 28,
+  fontWeight: '800',
+  lineHeight: 34,
+  paddingVertical: 4,
+  paddingHorizontal: 0,
   },
   editHelpText: {
     color: MUTED,

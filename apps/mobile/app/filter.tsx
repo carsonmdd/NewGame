@@ -90,7 +90,7 @@ export default function FilterScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header (no close button) */}
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Filters</Text>
         {totalRefinements > 0 ? (
@@ -209,8 +209,14 @@ function Row({
       : 'radio-button-off';
 
   return (
-    <TouchableOpacity style={[styles.row, selected && styles.rowSelected]} activeOpacity={0.7} onPress={onPress}>
-      <Text style={[styles.rowLabel, selected && styles.rowLabelSelected]}>{label}</Text>
+    <TouchableOpacity
+      style={[styles.row, selected && styles.rowSelected]}
+      activeOpacity={0.7}
+      onPress={onPress}
+    >
+      <Text style={[styles.rowLabel, selected && styles.rowLabelSelected]}>
+        {label}
+      </Text>
 
       <View style={styles.rowRight}>
         {rightText ? (
@@ -219,17 +225,28 @@ function Row({
           </View>
         ) : null}
 
-        <Ionicons name={iconName as any} size={18} color={selected ? TEXT : MUTED} />
+        <Ionicons
+          name={iconName as any}
+          size={18}
+          color={selected ? TEXT : MUTED}
+        />
       </View>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: BG },
+  safe: {
+    flex: 1,
+    backgroundColor: BG,
+  },
+
+  container: {
+    flex: 1,
+    backgroundColor: BG,
+  },
 
   header: {
-    paddingTop: 14,
     paddingHorizontal: 16,
     paddingBottom: 10,
     flexDirection: 'row',
@@ -238,7 +255,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: BORDER,
   },
-  headerTitle: { color: TEXT, fontSize: 16, fontWeight: '800' },
+
+  headerTitle: {
+    color: TEXT,
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '800',
+  },
 
   badge: {
     minWidth: 24,
@@ -249,16 +272,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badgeText: { color: '#fff', fontWeight: '900', fontSize: 12 },
+  badgeText: {
+    color: '#fff',
+    fontWeight: '800',
+    fontSize: 12,
+  },
 
-  content: { padding: 16, paddingBottom: 24 },
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 28,
+  },
 
-  sectionTitle: { color: TEXT, fontSize: 14, fontWeight: '800', marginBottom: 10 },
-  subSectionTitle: { color: '#E5E7EB', fontSize: 13, fontWeight: '800', marginBottom: 8 },
+  sectionTitle: {
+    color: TEXT,
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+
+  subSectionTitle: {
+    color: '#E5E7EB',
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
 
   sectionBox: {
     backgroundColor: CARD,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: BORDER,
     paddingHorizontal: 12,
@@ -267,24 +311,43 @@ const styles = StyleSheet.create({
 
   emptyText: {
     color: 'rgba(255,255,255,0.55)',
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: 13,
+    lineHeight: 18,
     paddingVertical: 6,
   },
 
   row: {
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 10,
-    paddingHorizontal: 6,
-    borderRadius: 10,
+    paddingHorizontal: 8,
+    borderRadius: 12,
   },
-  rowSelected: { backgroundColor: 'rgba(255,255,255,0.06)' },
-  rowLabel: { color: '#E5E7EB', fontSize: 13 },
-  rowLabelSelected: { fontWeight: '900', color: TEXT },
 
-  rowRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  rowSelected: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+
+  rowLabel: {
+    color: '#E5E7EB',
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: '500',
+  },
+
+  rowLabelSelected: {
+    fontWeight: '700',
+    color: TEXT,
+  },
+
+  rowRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginLeft: 10,
+  },
 
   countPill: {
     backgroundColor: '#252b33',
@@ -292,29 +355,50 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
-  countPillText: { color: '#fff', fontWeight: '900', fontSize: 11 },
 
-  footerBtns: { flexDirection: 'row', gap: 10, marginTop: 18 },
+  countPillText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+
+  footerBtns: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 22,
+  },
 
   btn: {
     flex: 1,
-    height: 40,
+    height: 44,
     borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  btnOutline: { borderWidth: 1, borderColor: TEXT, backgroundColor: 'transparent' },
-  btnDisabled: { opacity: 0.35 },
+
+  btnOutline: {
+    borderWidth: 1,
+    borderColor: TEXT,
+    backgroundColor: 'transparent',
+  },
+
+  btnDisabled: {
+    opacity: 0.35,
+  },
 
   btnSolidWrap: {
     flex: 1,
-    height: 40,
+    height: 44,
     borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: TEXT,
   },
 
-  btnText: { color: TEXT, fontSize: 13, fontWeight: '800' },
-
+  btnText: {
+    color: TEXT,
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '700',
+  },
 });
