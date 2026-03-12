@@ -185,7 +185,10 @@ export default function Home() {
 					)}
 
 					{activeTab === 'database' && (
-						<div className="max-w-6xl mx-auto" ref={dropdownWrapperRef}>
+						<div
+							className="max-w-6xl mx-auto"
+							ref={dropdownWrapperRef}
+						>
 							<div className="flex items-center gap-4 flex-wrap">
 								<div className="flex-1 min-w-[320px]">
 									<div className="flex items-center gap-3 bg-white border rounded-2xl px-4 py-3 shadow-sm">
@@ -301,11 +304,14 @@ export default function Home() {
 											<button
 												type="button"
 												onClick={() => {
-													setSelectedResourceType('all');
+													setSelectedResourceType(
+														'all',
+													);
 													setOpenDropdown(null);
 												}}
 												className={`w-full px-4 py-3 text-left text-[#333333] hover:bg-[#F3EAF8] ${
-													selectedResourceType === 'all'
+													selectedResourceType ===
+													'all'
 														? 'bg-[#F3EAF8] font-semibold text-[#333333]'
 														: ''
 												}`}
@@ -342,9 +348,7 @@ export default function Home() {
 										type="button"
 										onClick={() =>
 											setOpenDropdown((prev) =>
-												prev === 'tags'
-													? null
-													: 'tags',
+												prev === 'tags' ? null : 'tags',
 											)
 										}
 										className="w-full bg-[#8C4D93] text-white py-3 rounded-xl font-semibold"
@@ -477,7 +481,9 @@ export default function Home() {
 													? null
 													: editingResource
 											}
-											isEditing={editingResource !== 'new'}
+											isEditing={
+												editingResource !== 'new'
+											}
 											onSubmit={handleCreateOrUpdate}
 											onCancel={() =>
 												setEditingResource(null)
