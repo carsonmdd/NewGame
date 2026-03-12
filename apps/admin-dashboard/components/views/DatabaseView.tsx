@@ -157,26 +157,6 @@ const DatabaseView = () => {
 		<div className="max-w-6xl mx-auto p-8" ref={dropdownWrapperRef}>
 			<div className="flex items-center gap-4 flex-wrap">
 				<div className="flex-1 min-w-[320px]">
-					{/* <div className="flex items-center gap-3 bg-white border rounded-2xl px-4 py-3 shadow-sm border-red-400">
-						<span className="text-slate-500" aria-hidden>
-							🔍
-						</span>
-						<input
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
-							placeholder="Search for resources"
-							className="w-full outline-none text-[#333333] bg-transparent"
-						/>
-						<button
-							type="button"
-							className="text-slate-500 hover:text-slate-800"
-							aria-label="Clear search"
-							title="Clear search"
-							onClick={() => setSearch('')}
-						>
-							✕
-						</button>
-					</div> */}
 					<SearchBar onSearch={(term) => setSearch(term)} />
 				</div>
 
