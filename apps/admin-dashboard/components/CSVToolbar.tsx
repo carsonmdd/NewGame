@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { Button } from './ui/button';
 import { ButtonGroup } from './ui/button-group';
+import { Download, Upload } from 'lucide-react';
 
 type Props = {
 	onExport: () => void;
@@ -27,18 +28,12 @@ const CSVToolbar = ({ onExport, onImport }: Props) => {
 			/>
 
 			<ButtonGroup>
-				<Button
-					variant="outline"
-					className="bg-gray-300"
-					onClick={handleImportClick}
-				>
+				<Button variant="secondary" onClick={handleImportClick}>
+					<Upload className="mr-2 size-4" />
 					Import CSV
 				</Button>
-				<Button
-					onClick={onExport}
-					variant="outline"
-					className="bg-gray-300"
-				>
+				<Button variant="secondary" onClick={onExport}>
+					<Download className="mr-2 size-4" />
 					Export CSV
 				</Button>
 			</ButtonGroup>

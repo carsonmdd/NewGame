@@ -1,7 +1,7 @@
 import InProgressView from './InProgressView';
 
 const ReviewView = () => {
-	return <InProgressView title="Resources for Review" />;
+	return <InProgressView title="Review" />;
 };
 
 export default ReviewView;

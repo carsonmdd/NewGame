@@ -9,7 +9,7 @@ import {
 	SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
-type TabKey = 'database' | 'review' | 'analytics' | 'notifications';
+type TabKey = 'catalog' | 'review' | 'analytics' | 'notifications';
 
 interface AppSidebarProps {
 	activeTab: TabKey;
@@ -19,12 +19,12 @@ interface AppSidebarProps {
 export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
 	const items = [
 		{
-			title: 'Database Search',
-			key: 'database' as TabKey,
+			title: 'Catalog',
+			key: 'catalog' as TabKey,
 			icon: Search,
 		},
 		{
-			title: 'Resources for Review',
+			title: 'Review',
 			key: 'review' as TabKey,
 			icon: ClipboardCheck,
 		},
@@ -41,22 +41,36 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
 	];
 
 	return (
-		<Sidebar variant="floating" collapsible="icon">
-			<SidebarContent>
+		<Sidebar
+			variant="floating"
+			collapsible="icon"
+			className="border-white/10"
+		>
+			<SidebarContent className="bg-bg-base/40 backdrop-blur-xl border-r border-white/5">
 				<SidebarGroup>
-					<SidebarGroupContent>
+					<SidebarGroupContent className="mt-4">
 						<SidebarMenu>
 							{items.map((item) => (
-								<SidebarMenuItem key={item.title}>
+								<SidebarMenuItem
+									key={item.title}
+									className="mb-1"
+								>
 									<SidebarMenuButton
-										className="p-8 gap-4 cursor-pointer"
+										className="h-10 px-4 gap-3 cursor-pointer transition-all duration-200"
 										onClick={() => onTabChange(item.key)}
 										isActive={activeTab === item.key}
 									>
-										<item.icon className="size-5!" />
-										<span className="text-[14px]">
+										<item.icon
+											className={`size-4 transition-colors ${activeTab === item.key ? 'text-accent-blue' : 'text-muted-foreground'}`}
+										/>
+										<span
+											className={`text-[13px] font-medium transition-colors ${activeTab === item.key ? 'text-foreground' : 'text-muted-foreground'}`}
+										>
 											{item.title}
 										</span>
+										{activeTab === item.key && (
+											<div className="absolute left-0 w-1 h-4 bg-accent-blue rounded-r-full shadow-[0_0_8px_rgba(94,106,210,0.8)]" />
+										)}
 									</SidebarMenuButton>
 								</SidebarMenuItem>
 							))}

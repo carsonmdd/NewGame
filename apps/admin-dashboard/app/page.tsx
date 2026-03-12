@@ -1,27 +1,21 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { resourceApi } from '@/lib/api';
-import { Resource, ResourceInput } from '@/types/resource';
-import ResourceForm from '@/components/ResourceForm';
-import ResourceCard from '@/components/ResourceCard';
-import CSVToolbar from '@/components/CSVToolbar';
-import { useResourceCSV } from '@/hooks/useResourceCSV';
 import { AppSidebar } from '@/components/AppSidebar';
-import DatabaseView from '@/components/views/DatabaseView';
+import CatalogView from '@/components/views/CatalogView';
 import ReviewView from '@/components/views/ReviewView';
 import AnalyticsView from '@/components/views/AnalyticsView';
 import NotificationsView from '@/components/views/NotificationsView';
+import { useState } from 'react';
 
-type TabKey = 'database' | 'review' | 'analytics' | 'notifications';
+type TabKey = 'catalog' | 'review' | 'analytics' | 'notifications';
 
 export default function Home() {
-	const [activeTab, setActiveTab] = useState<TabKey>('database');
+	const [activeTab, setActiveTab] = useState<TabKey>('catalog');
 
 	const renderView = () => {
 		switch (activeTab) {
-			case 'database':
-				return <DatabaseView />;
+			case 'catalog':
+				return <CatalogView />;
 			case 'review':
 				return <ReviewView />;
 			case 'analytics':
@@ -29,7 +23,7 @@ export default function Home() {
 			case 'notifications':
 				return <NotificationsView />;
 			default:
-				return <DatabaseView />;
+				return <CatalogView />;
 		}
 	};
 
