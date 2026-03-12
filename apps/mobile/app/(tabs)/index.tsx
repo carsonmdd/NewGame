@@ -8,7 +8,6 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
 	const [trending, setTrending] = useState<Resource[]>([]);
