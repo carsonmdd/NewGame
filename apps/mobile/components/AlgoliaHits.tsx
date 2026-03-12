@@ -1,23 +1,42 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, {useMemo} from 'react';
 import { useHits, UseHitsProps } from 'react-instantsearch-core';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { ResourceCard } from '@/components/ResourceCard';
 import { Resource } from '@/types/resource';
 import { getStableId } from '@/utils/resourceRender';
+import { getSearchSortMode } from '@/lib/searchSort';
 
 export function AlgoliaHits(props: UseHitsProps<Resource>) {
   const { hits } = useHits(props);
   const router = useRouter();
 
-  if (hits.length === 0) {
+  const visibleHits = useMemo(() => {
+    const sortMode = getSearchSortMode();
+
+    if (sortMode !== 'recent') {
+      return hits;
+    }
+
+    return [...hits].sort((a, b) => {
+      const aTime = Date.parse(a.createdAt ?? '');
+      const bTime = Date.parse(b.createdAt ?? '');
+
+      const safeATime = Number.isNaN(aTime) ? 0 : aTime;
+      const safeBTime = Number.isNaN(bTime) ? 0 : bTime;
+
+      return safeBTime - safeATime;
+    });
+  }, [hits]);
+
+  if (visibleHits.length === 0) {
     return <Text style={styles.subtleText}>No resources found.</Text>;
   }
 
   return (
     <View style={styles.grid}>
-      {hits.map((item) => (
+      {visibleHits.map((item) => (
         <ResourceCard
 			key={getStableId(item)}
 			item={item}

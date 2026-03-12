@@ -1,13 +1,24 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { StyleSheet, TextInput, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useSearchBox, UseSearchBoxProps } from 'react-instantsearch-core';
+import { useSearchBox, UseSearchBoxProps, useCurrentRefinements } from 'react-instantsearch-core';
 import { router } from 'expo-router';
 
 export function AlgoliaSearchBox(props: UseSearchBoxProps) {
   const { query, refine } = useSearchBox(props);
   const [inputValue, setInputValue] = useState(query);
   const inputRef = useRef<TextInput>(null);
+
+  const { items } = useCurrentRefinements();
+
+  const hasActiveFilters = useMemo(() => {
+    return items.some(
+      (group) =>
+        (group.attribute === 'resourceType' ||
+          group.attribute === 'difficulty') &&
+        group.refinements.length > 0
+    );
+  }, [items]);
 
   function setQuery(newQuery: string) {
     setInputValue(newQuery);
@@ -40,13 +51,16 @@ export function AlgoliaSearchBox(props: UseSearchBoxProps) {
         accessibilityRole="button"
         accessibilityLabel="Open filters"
         activeOpacity={0.7}
-        style={styles.filterBtn}
+        style={[
+          styles.filterBtn,
+          hasActiveFilters && styles.filterBtnActive,
+        ]}
         onPress={() => router.push('../filter')}
       >
         <Ionicons
           name="options-outline"
           size={18}
-          color="#F9FAFB"
+          color={hasActiveFilters ? '#0B0B0F' : '#F9FAFB'}
         />
       </TouchableOpacity>
     </View>
@@ -75,5 +89,8 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     padding: 6,
     borderRadius: 999,
+  },
+  filterBtnActive: {
+    backgroundColor: '#F9FAFB',
   },
 });

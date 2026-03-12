@@ -5,30 +5,36 @@ import {
   Alert,
   FlatList,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useSavedResources } from '@/contexts/SavedResourcesContext';
 import { Resource } from '@/types/resource';
 
 /**
  * SAVED TAB
- * - Collections are a vertical 2-column grid
+ * - Outer page now uses ScrollView
+ * - Collections are rendered manually in 2-column rows
  * - Default collection: "Recently Saved"
- * - "+" tile creates a new collection tile (placeholder)
+ * - "+" tile creates a new collection tile
  * - Tapping a collection opens the modal
- * - "Recently Saved" modal now uses real saved resources from context
+ * - "Recently Saved" modal uses real saved resources from context
  */
 
 type Collection = {
   id: string;
   name: string;
 };
+
+type GridItem =
+  | { kind: 'collection'; collection: Collection; id: string }
+  | { kind: 'add'; id: string };
 
 type ModalTile =
   | { id: string; kind: 'add' }
@@ -38,11 +44,11 @@ const BG = '#050509';
 const TEXT = '#F9FAFB';
 const MUTED = '#9CA3AF';
 const INPUT = '#2A2A2A';
-const TILE_BG = '#1B1B22';
 
 const NAME_MAX = 22;
 
 export default function SavedScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { savedResources } = useSavedResources();
 
@@ -143,12 +149,25 @@ export default function SavedScreen() {
     );
   };
 
-  const gridData = useMemo(() => {
+  const gridData: GridItem[] = useMemo(() => {
     return [
-      ...collections.map((c) => ({ kind: 'collection' as const, collection: c, id: c.id })),
+      ...collections.map((c) => ({
+        kind: 'collection' as const,
+        collection: c,
+        id: c.id,
+      })),
       { kind: 'add' as const, id: 'add' },
     ];
   }, [collections]);
+
+  // Group into 2-column rows for ScrollView rendering
+  const collectionRows = useMemo(() => {
+    const rows: GridItem[][] = [];
+    for (let i = 0; i < gridData.length; i += 2) {
+      rows.push(gridData.slice(i, i + 2));
+    }
+    return rows;
+  }, [gridData]);
 
   const filteredSavedResources = useMemo(() => {
     const q = collectionSearch.trim().toLowerCase();
@@ -180,57 +199,64 @@ export default function SavedScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['left', 'right']}>
-      <View style={styles.container}>
-        <View style={styles.headerRow}>
-          <Text style={styles.headerTitle}>Saved</Text>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>👨‍💻</Text>
-          </View>
-        </View>
-
-        <Text style={styles.sectionTitle}>Collections</Text>
-
-        <FlatList
-          data={gridData}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          columnWrapperStyle={styles.columnWrap}
-          contentContainerStyle={styles.gridContent}
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => {
-            if (item.kind === 'add') {
-              return (
-                <View style={styles.addTileWrap}>
-                  <TouchableOpacity
-                    activeOpacity={0.85}
-                    onPress={addCollection}
-                    style={styles.addTile}
-                    accessibilityRole="button"
-                    accessibilityLabel="Create new collection"
-                  >
-                    <Text style={styles.addPlus}>+</Text>
-                  </TouchableOpacity>
-                </View>
-              );
-            }
+        >
+          <View style={styles.headerRow}>
+            <Text style={styles.headerTitle}>Saved</Text>
+            <View style={styles.avatarCircle}>
+              <Ionicons name="person" size={18} color="#111" />
+            </View>
+          </View>
 
-            const c = item.collection;
-            return (
-              <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={() => openModalForCollection(c)}
-                style={styles.collectionTile}
-                accessibilityRole="button"
-                accessibilityLabel={`Open collection ${c.name}`}
-              >
-                <View style={styles.collectionSquare} />
-                <Text style={styles.collectionName} numberOfLines={1}>
-                  {c.name}
-                </Text>
-              </TouchableOpacity>
-            );
-          }}
-        />
+          <Text style={styles.sectionTitle}>Collections</Text>
+
+          <View style={styles.gridWrap}>
+            {collectionRows.map((row, rowIndex) => (
+              <View key={`row-${rowIndex}`} style={styles.columnWrap}>
+                {row.map((item) => {
+                  if (item.kind === 'add') {
+                    return (
+                      <View key={item.id} style={styles.addTileWrap}>
+                        <TouchableOpacity
+                          activeOpacity={0.85}
+                          onPress={addCollection}
+                          style={styles.addTile}
+                          accessibilityRole="button"
+                          accessibilityLabel="Create new collection"
+                        >
+                          <Text style={styles.addPlus}>+</Text>
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  }
+
+                  const c = item.collection;
+                  return (
+                    <TouchableOpacity
+                      key={c.id}
+                      activeOpacity={0.85}
+                      onPress={() => openModalForCollection(c)}
+                      style={styles.collectionTile}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Open collection ${c.name}`}
+                    >
+                      <View style={styles.collectionSquare} />
+                      <Text style={styles.collectionName} numberOfLines={1}>
+                        {c.name}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+
+                {/* Spacer when row has only one item */}
+                {row.length === 1 ? <View style={styles.rowSpacer} /> : null}
+              </View>
+            ))}
+          </View>
+        </ScrollView>
 
         <Modal
           visible={!!openCollection}
@@ -238,11 +264,13 @@ export default function SavedScreen() {
           presentationStyle="fullScreen"
           onRequestClose={closeModal}
         >
-          <SafeAreaView style={styles.modalSafe} edges={['top', 'left', 'right']}>
-            <View style={styles.modalContainer}>
+          <SafeAreaView style={styles.modalSafe} edges={['left', 'right']}>
+            <View style={[styles.modalContainer, { paddingTop: insets.top }]}>
               <View style={styles.modalHeader}>
                 <View style={styles.modalTitleRow}>
-                  {!isEditingTitle ? (
+                  {openCollection?.id === 'recent' ? (
+                    <Text style={styles.modalTitle}>{openCollectionName}</Text>
+                  ) : !isEditingTitle ? (
                     <TouchableOpacity
                       activeOpacity={0.8}
                       onPress={startEditingTitle}
@@ -276,15 +304,17 @@ export default function SavedScreen() {
                 </View>
 
                 <View style={styles.modalHeaderBtns}>
-                  <TouchableOpacity
-                    accessibilityRole="button"
-                    accessibilityLabel="Delete collection"
-                    activeOpacity={0.8}
-                    onPress={deleteCollection}
-                    style={styles.iconBtn}
-                  >
-                    <Ionicons name="trash-outline" size={22} color={TEXT} />
-                  </TouchableOpacity>
+                  {openCollection?.id !== 'recent' && (
+                    <TouchableOpacity
+                      accessibilityRole="button"
+                      accessibilityLabel="Delete collection"
+                      activeOpacity={0.8}
+                      onPress={deleteCollection}
+                      style={styles.iconBtn}
+                    >
+                      <Ionicons name="trash-outline" size={22} color={TEXT} />
+                    </TouchableOpacity>
+                  )}
 
                   <TouchableOpacity
                     accessibilityRole="button"
@@ -412,45 +442,53 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: BG,
     paddingHorizontal: 20,
-    paddingTop: 10,
+  },
+  scrollContent: {
+    paddingBottom: 24,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 6,
+    marginTop: 2,
   },
   headerTitle: {
     color: TEXT,
-    fontSize: 44,
+    fontSize: 32,
     fontWeight: '800',
     letterSpacing: 0.2,
+    lineHeight: 38,
   },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 999,
-    backgroundColor: TILE_BG,
+  avatarCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#E9F1FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: {
-    fontSize: 18,
-  },
   sectionTitle: {
     color: TEXT,
-    fontSize: 40,
+    fontSize: 30,
     fontWeight: '800',
     marginTop: 0,
     marginBottom: 12,
+    lineHeight: 36,
   },
-  gridContent: {
-    paddingBottom: 24,
+
+  gridWrap: {
+    paddingBottom: 12,
   },
   columnWrap: {
+    flexDirection: 'row',
     gap: 18,
     marginBottom: 18,
   },
+  rowSpacer: {
+    flex: 1,
+  },
+
   collectionTile: {
     flex: 1,
   },
@@ -484,6 +522,7 @@ const styles = StyleSheet.create({
     fontWeight: '200',
     marginTop: -6,
   },
+
   modalSafe: {
     flex: 1,
     backgroundColor: BG,
@@ -494,8 +533,8 @@ const styles = StyleSheet.create({
   },
   modalHeader: {
     paddingHorizontal: 20,
-    paddingTop: 6,
-    paddingBottom: 8,
+    paddingTop: 4,
+    paddingBottom: 10,
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
@@ -509,17 +548,19 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     color: TEXT,
-    fontSize: 38,
+    fontSize: 30,
     fontWeight: '800',
+    lineHeight: 36,
   },
   modalTitleEditWrap: {
     paddingTop: 2,
   },
   modalTitleInput: {
     color: TEXT,
-    fontSize: 34,
+    fontSize: 28,
     fontWeight: '800',
-    paddingVertical: 6,
+    lineHeight: 34,
+    paddingVertical: 4,
     paddingHorizontal: 0,
   },
   editHelpText: {
