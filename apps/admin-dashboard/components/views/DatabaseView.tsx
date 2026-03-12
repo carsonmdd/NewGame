@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import CSVToolbar from '../CSVToolbar';
 import ResourceCard from '../ResourceCard';
 import ResourceForm from '../ResourceForm';
+import SearchBar from '../SearchBar';
 
 type OpenDropdown = null | 'newest' | 'language' | 'tags';
 
@@ -152,21 +153,11 @@ const DatabaseView = () => {
 		return result;
 	}, [resources, search, selectedResourceType, selectedTag, newestOrder]);
 
-	const Placeholder = ({ title }: { title: string }) => (
-		<div className="max-w-5xl">
-			<h1 className="text-2xl font-bold text-[#333333]">{title}</h1>
-			<p className="mt-2 text-slate-600">
-				This section is set up for navigation, but will be implemented
-				later.
-			</p>
-		</div>
-	);
-
 	return (
 		<div className="max-w-6xl mx-auto p-8" ref={dropdownWrapperRef}>
 			<div className="flex items-center gap-4 flex-wrap">
 				<div className="flex-1 min-w-[320px]">
-					<div className="flex items-center gap-3 bg-white border rounded-2xl px-4 py-3 shadow-sm">
+					{/* <div className="flex items-center gap-3 bg-white border rounded-2xl px-4 py-3 shadow-sm border-red-400">
 						<span className="text-slate-500" aria-hidden>
 							🔍
 						</span>
@@ -185,7 +176,8 @@ const DatabaseView = () => {
 						>
 							✕
 						</button>
-					</div>
+					</div> */}
+					<SearchBar onSearch={(term) => setSearch(term)} />
 				</div>
 
 				<CSVToolbar onExport={handleExport} onImport={handleImport} />

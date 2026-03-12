@@ -8,10 +8,10 @@ import ResourceCard from '@/components/ResourceCard';
 import CSVToolbar from '@/components/CSVToolbar';
 import { useResourceCSV } from '@/hooks/useResourceCSV';
 import { AppSidebar } from '@/components/AppSidebar';
-import DatabaseView from '@/components/tabs/DatabaseView';
-import ReviewView from '@/components/tabs/ReviewView';
-import AnalyticsView from '@/components/tabs/AnalyticsView';
-import NotificationsView from '@/components/tabs/NotificationsView';
+import DatabaseView from '@/components/views/DatabaseView';
+import ReviewView from '@/components/views/ReviewView';
+import AnalyticsView from '@/components/views/AnalyticsView';
+import NotificationsView from '@/components/views/NotificationsView';
 
 type TabKey = 'database' | 'review' | 'analytics' | 'notifications';
 
