@@ -1,26 +1,49 @@
+'use client';
+
+import { useRef } from 'react';
+import { Button } from './ui/button';
+import { ButtonGroup } from './ui/button-group';
+
 type Props = {
 	onExport: () => void;
 	onImport: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-const CSVToolbar = ({ onExport, onImport }: Props) => (
-	<div className='flex space-x-2'>
-		<button
-			onClick={onExport}
-			className='bg-blue-600 text-white px-3 py-1 text-sm rounded hover:bg-blue-700 cursor-pointer'
-		>
-			Export CSV
-		</button>
-		<label className='bg-orange-600 text-white px-3 py-1 text-sm rounded cursor-pointer hover:bg-orange-700 flex items-center justify-center'>
-			Import CSV
+const CSVToolbar = ({ onExport, onImport }: Props) => {
+	const fileInputRef = useRef<HTMLInputElement>(null);
+
+	const handleImportClick = () => {
+		fileInputRef.current?.click();
+	};
+
+	return (
+		<div className="flex space-x-2">
 			<input
-				type='file'
-				accept='.csv'
-				className='hidden'
+				type="file"
+				ref={fileInputRef}
+				accept=".csv"
+				className="hidden"
 				onChange={onImport}
 			/>
-		</label>
-	</div>
-);
+
+			<ButtonGroup>
+				<Button
+					variant="outline"
+					className="bg-gray-300"
+					onClick={handleImportClick}
+				>
+					Import CSV
+				</Button>
+				<Button
+					onClick={onExport}
+					variant="outline"
+					className="bg-gray-300"
+				>
+					Export CSV
+				</Button>
+			</ButtonGroup>
+		</div>
+	);
+};
 
 export default CSVToolbar;
