@@ -97,7 +97,7 @@ export default function ResourceForm({
 		<div className="relative w-full max-w-4xl mx-auto overflow-hidden">
 			<form
 				onSubmit={handleSubmit}
-				className="bg-bg-elevated/60 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl p-8 md:p-12"
+				className="bg-bg-elevated/60 backdrop-blur-2xl rounded-2xl shadow-2xl p-8 md:p-12"
 			>
 				<header className="flex items-center justify-between mb-10">
 					<div>

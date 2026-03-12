@@ -2,7 +2,7 @@
 
 import { Resource } from '@/types/resource';
 import { Button } from '@/components/ui/button';
-import { Edit2, Trash2, Plus } from 'lucide-react';
+import { Edit2, Trash2 } from 'lucide-react';
 import { useState, useRef, MouseEvent } from 'react';
 
 export default function ResourceCard({
