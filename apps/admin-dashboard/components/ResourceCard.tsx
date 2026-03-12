@@ -74,16 +74,6 @@ export default function ResourceCard({
 						{t}
 					</span>
 				))}
-
-				<Button
-					variant="secondary"
-					size="icon-xs"
-					className="rounded-full"
-					onClick={() => {}}
-				>
-					<Plus className="size-3" />
-				</Button>
-
 				<Button
 					variant="ghost"
 					size="xs"
