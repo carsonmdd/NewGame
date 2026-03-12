@@ -1,4 +1,6 @@
-import React from 'react';
+import { resourceApi } from '@/lib/api';
+import { Resource } from '@/types/resource';
+import React, { useEffect, useState } from 'react';
 import {
 	ScrollView,
 	StyleSheet,
@@ -6,20 +8,30 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-
-const trendingData = [
-	{ id: '1', title: 'How Gamers Start Your First Coding Lesson' },
-	{ id: '2', title: 'Popular for New Developers' },
-];
-
-const latestData = [
-	{ id: '3', title: 'Learn CSV and Data Files' },
-	{ id: '4', title: 'System Architecture Basics' },
-];
 
 export default function HomeScreen() {
-	const router = useRouter();
+	const [trending, setTrending] = useState<Resource[]>([]);
+	const [latest, setLatest] = useState<Resource[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState('');
+
+	const loadResources = async () => {
+		try {
+			setLoading(true);
+			setError('');
+			const response = await resourceApi.discover();
+			setTrending(response.data.trending);
+			setLatest(response.data.new);
+		} catch (e) {
+			setError('Failed to load resources.');
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		loadResources();
+	}, []);
 
 	return (
 		<View style={styles.container}>
@@ -36,21 +48,20 @@ export default function HomeScreen() {
 				<View style={styles.section}>
 					<View style={styles.sectionHeader}>
 						<Text style={styles.sectionTitle}>Trending</Text>
-						<TouchableOpacity onPress={() => router.push('/trending')}>
-							<Text style={styles.sectionLink}>See all</Text>
-						</TouchableOpacity>
 					</View>
 
-					{trendingData.map((item) => (
+					{trending.map((item) => (
 						<TouchableOpacity
 							key={item.id}
 							activeOpacity={0.85}
 							style={styles.resourceCard}
-							onPress={() => router.push('/trending')}
 						>
 							<View style={styles.imagePlaceholder} />
 							<View style={styles.cardOverlay}>
-								<Text style={styles.cardTitle} numberOfLines={2}>
+								<Text
+									style={styles.cardTitle}
+									numberOfLines={2}
+								>
 									{item.title}
 								</Text>
 							</View>
@@ -61,21 +72,20 @@ export default function HomeScreen() {
 				<View style={styles.section}>
 					<View style={styles.sectionHeader}>
 						<Text style={styles.sectionTitle}>Latest</Text>
-						<TouchableOpacity onPress={() => router.push('/latest')}>
-							<Text style={styles.sectionLink}>See all</Text>
-						</TouchableOpacity>
 					</View>
 
-					{latestData.map((item) => (
+					{latest.map((item) => (
 						<TouchableOpacity
 							key={item.id}
 							activeOpacity={0.85}
 							style={styles.resourceCard}
-							onPress={() => router.push('/latest')}
 						>
 							<View style={styles.imagePlaceholder} />
 							<View style={styles.cardOverlay}>
-								<Text style={styles.cardTitle} numberOfLines={2}>
+								<Text
+									style={styles.cardTitle}
+									numberOfLines={2}
+								>
 									{item.title}
 								</Text>
 							</View>
