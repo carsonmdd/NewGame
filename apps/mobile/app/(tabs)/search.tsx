@@ -6,34 +6,39 @@ import { AlgoliaSearchBox } from '@/components/AlgoliaSearchBox';
 import { AlgoliaHits } from '@/components/AlgoliaHits';
 
 import { AlgoliaFilterWidgets } from '@/components/AlgoliaFilterWidgets';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SearchScreen() {
+	const insets = useSafeAreaInsets();
+
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.safe} edges={['left', 'right']}>
+			<View style={[styles.container, { paddingTop: insets.top }] }>
 
-			{/* Keep Filters Updated */}
-			<AlgoliaFilterWidgets />
+				{/* Keep Filters Updated */}
+				<AlgoliaFilterWidgets />
 
-			<ScrollView
-				contentContainerStyle={styles.scrollContent}
-				showsVerticalScrollIndicator={false}
-			>
-				{/* Top bar: big Search + avatar */}
-				<View style={styles.topBar}>
-					<Text style={styles.screenLabel}>Search</Text>
+				<ScrollView
+					contentContainerStyle={styles.scrollContent}
+					showsVerticalScrollIndicator={false}
+				>
+					{/* Top bar: big Search + avatar */}
+					<View style={styles.topBar}>
+						<Text style={styles.screenLabel}>Search</Text>
 
-					<View style={styles.avatarCircle}>
-						<Ionicons name="person" size={18} color="#111" />
+						<View style={styles.avatarCircle}>
+							<Ionicons name="person" size={18} color="#111" />
+						</View>
 					</View>
-				</View>
 
-				{/* Search bar with Algolia */}
-				<AlgoliaSearchBox />
+					{/* Search bar with Algolia */}
+					<AlgoliaSearchBox />
 
-				{/* Algolia Results */}
-				<AlgoliaHits />
-			</ScrollView>
-		</View>
+					{/* Algolia Results */}
+					<AlgoliaHits />
+				</ScrollView>
+			</View>
+		</SafeAreaView>
 	);
 }
 
@@ -41,13 +46,17 @@ const BG = '#0B0B0F';
 const CARD = '#17133A';
 
 const styles = StyleSheet.create({
+	safe: {
+    flex: 1,
+    backgroundColor: BG,
+	},
 	container: {
 		flex: 1,
 		backgroundColor: BG,
 	},
 	scrollContent: {
 		paddingHorizontal: 16,
-		paddingTop: 12,
+		paddingTop: 10,
 		paddingBottom: 32,
 	},
 
