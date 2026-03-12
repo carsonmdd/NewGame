@@ -1,90 +1,69 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Alert, Image} from 'react-native';
-import { useHits, UseHitsProps } from 'react-instantsearch-core';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import React, {useMemo} from 'react';
+import { useHits, UseHitsProps } from 'react-instantsearch-core';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { ResourceCard } from '@/components/ResourceCard';
 import { Resource } from '@/types/resource';
-import { handleResourcePress } from '@/utils/resourceAction';
-import { getKind, getStableId, isYouTubeUrl, getYouTubeThumb } from '@/utils/resourceRender';
-
+import { getStableId } from '@/utils/resourceRender';
+import { getSearchSortMode } from '@/lib/searchSort';
 
 export function AlgoliaHits(props: UseHitsProps<Resource>) {
-	const { hits } = useHits(props);
-  	const router = useRouter();
+  const { hits } = useHits(props);
+  const router = useRouter();
 
-	const handlePress = (item: Resource) => {
-		Alert.alert(item.title, item.description);
-	};
+  const visibleHits = useMemo(() => {
+    const sortMode = getSearchSortMode();
 
-	if (hits.length === 0) {
-		return <Text style={styles.subtleText}>No resources found.</Text>;
-	}
+    if (sortMode !== 'recent') {
+      return hits;
+    }
 
-	return (
-		<View style={styles.grid}>
-		{hits.map((item) => {
-			const kind = getKind(item);
-			const key = getStableId(item);
+    return [...hits].sort((a, b) => {
+      const aTime = Date.parse(a.createdAt ?? '');
+      const bTime = Date.parse(b.createdAt ?? '');
 
-			const thumb =
-			kind === 'VIDEO' && item.url && isYouTubeUrl(item.url)
-				? getYouTubeThumb(item.url)
-				: null;
+      const safeATime = Number.isNaN(aTime) ? 0 : aTime;
+      const safeBTime = Number.isNaN(bTime) ? 0 : bTime;
 
-			return (
-			<TouchableOpacity
-				key={key}
-				style={styles.card}
-				activeOpacity={0.7}
-				onPress={() => handleResourcePress(router, item)}
-			>
-				{thumb ? <Image source={{ uri: thumb }} style={styles.thumb} /> : null}
+      return safeBTime - safeATime;
+    });
+  }, [hits]);
 
-				<View style={styles.iconBadge}>
-				{kind === 'IN_APP' && <Ionicons name="document-text" size={16} color="#fff" />}
-				{kind === 'PDF' && <Ionicons name="document" size={16} color="#fff" />}
-				{kind === 'AUDIO' && <Ionicons name="play" size={16} color="#fff" />}
-				{kind === 'VIDEO' && <Ionicons name="logo-youtube" size={16} color="#fff" />}
-				{kind === 'LINK' && <Ionicons name="open-outline" size={16} color="#fff" />}
-				</View>
+  if (visibleHits.length === 0) {
+    return <Text style={styles.subtleText}>No resources found.</Text>;
+  }
 
-				<Text style={styles.cardTitle} numberOfLines={2}>
-				{item.title}
-				</Text>
-			</TouchableOpacity>
-			);
-		})}
-		</View>
-	);
+  return (
+    <View style={styles.grid}>
+      {visibleHits.map((item) => (
+        <ResourceCard
+			key={getStableId(item)}
+			item={item}
+			onOpenText={(id) =>
+				router.push({ pathname: '/resource/[id]', params: { id: item.objectID || item.id, resource: JSON.stringify(item)} })
+			}
+			onOpenPdf={(id) =>
+				router.push({ pathname: '/resource/[id]', params: { id: item.objectID || item.id, resource: JSON.stringify(item)} })
+			}
+			onOpenExternal={(_url) =>
+				router.push({ pathname: '/resource/[id]', params: { id: item.objectID || item.id, resource: JSON.stringify(item)} })
+			}
+		/>
+      ))}
+    </View>
+  );
 }
 
-const CARD = '#17133A';
-
 const styles = StyleSheet.create({
-	subtleText: {
-		color: 'rgba(255,255,255,0.65)',
-		fontSize: 13,
-		marginBottom: 8,
-	},
-	grid: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'space-between',
-	},
-	card: {
-		backgroundColor: CARD,
-		borderRadius: 18,
-		padding: 12,
-		marginBottom: 14,
-		width: '48%',
-		minHeight: 160,
-		justifyContent: 'flex-end',
-	},
-	cardTitle: {
-		color: '#FFFFFF',
-		fontSize: 16,
-		fontWeight: '900',
-		lineHeight: 20,
-	},
+  subtleText: {
+    color: 'rgba(255,255,255,0.65)',
+    fontSize: 13,
+    marginBottom: 8,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
 });

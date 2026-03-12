@@ -25,4 +25,8 @@ export interface Resource {
 	saveCount: number;
 	createdAt: string;
 	updatedAt: string;
+
+	author?: string;
+	content?: string;
+	imageUrl?: string;
 }

@@ -1,119 +1,174 @@
-import React, { useMemo, useState } from 'react';
-import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import * as Linking from 'expo-linking';
 import { Ionicons } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
+import { Image } from 'expo-image';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import type { Resource } from '@/types/resource';
-import { getRenderKind, getYouTubeThumb } from '@/utils/resourceRender';
+import { Resource } from '@/types/resource';
+import {
+  getDisplayKind,
+  getStableId,
+  getYouTubeThumb,
+  isYouTubeUrl,
+} from '@/utils/resourceRender';
 
-export default function ResourceCard({
-  resource,
-  onOpenInApp,
-  onOpenPdf,
-}: {
-  resource: Resource;
-  onOpenInApp: (id: string) => void;
+type Props = {
+  item: Resource;
+  onOpenText: (id: string) => void;
   onOpenPdf: (id: string) => void;
-}) {
-  const kind = getRenderKind(resource);
+  onOpenExternal: (url: string) => void;
+};
 
-  const thumb = useMemo(() => {
-    if (kind === 'YOUTUBE') return getYouTubeThumb(resource.url);
-    return null;
-  }, [kind, resource.url]);
-
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const [playing, setPlaying] = useState(false);
-
-  const onPress = async () => {
-    if (kind === 'IN_APP_TEXT') return onOpenInApp(resource.id);
-    if (kind === 'PDF') return onOpenPdf(resource.id);
-
-    if ((kind === 'YOUTUBE' || kind === 'LINK') && resource.url) {
-      await Linking.openURL(resource.url);
-      return;
-    }
-
-    if (kind === 'AUDIO') {
-      try {
-        if (!resource.url) {
-          Alert.alert('Audio missing', 'No audio URL found for this resource.');
-          return;
-        }
-
-        if (!sound) {
-          const { sound: newSound } = await Audio.Sound.createAsync(
-            { uri: resource.url },
-            { shouldPlay: true }
-          );
-          setSound(newSound);
-          setPlaying(true);
-          return;
-        }
-
-        if (playing) {
-          await sound.pauseAsync();
-          setPlaying(false);
-        } else {
-          await sound.playAsync();
-          setPlaying(true);
-        }
-      } catch (e) {
-        console.error(e);
-        Alert.alert('Audio error', 'Could not play this audio.');
-      }
-    }
-  };
-
-  React.useEffect(() => {
-    return () => {
-      sound?.unloadAsync();
-    };
-  }, [sound]);
+function AudioButton({ url }: { url: string }) {
+  const player = useAudioPlayer({ uri: url });
 
   return (
-    <Pressable style={styles.card} onPress={onPress}>
-      {thumb ? <Image source={{ uri: thumb }} style={styles.thumb} /> : null}
-
-      <View style={styles.row}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.title} numberOfLines={2}>{resource.title}</Text>
-          <Text style={styles.desc} numberOfLines={2}>{resource.description}</Text>
-        </View>
-
-        <View style={styles.iconBadge}>
-          {kind === 'IN_APP_TEXT' && <Ionicons name="document-text" size={18} color="#fff" />}
-          {kind === 'PDF' && <Ionicons name="document" size={18} color="#fff" />}
-          {kind === 'YOUTUBE' && <Ionicons name="logo-youtube" size={18} color="#fff" />}
-          {kind === 'LINK' && <Ionicons name="open-outline" size={18} color="#fff" />}
-          {kind === 'AUDIO' && (
-            <Ionicons name={playing ? 'pause' : 'play'} size={18} color="#fff" />
-          )}
-        </View>
-      </View>
-
-      <Text style={styles.hint}>
-        {kind === 'IN_APP_TEXT' && 'Open'}
-        {kind === 'PDF' && 'Open PDF'}
-        {kind === 'YOUTUBE' && 'Open YouTube'}
-        {kind === 'LINK' && 'Open link'}
-        {kind === 'AUDIO' && (playing ? 'Tap to pause' : 'Tap to play')}
+    <TouchableOpacity
+      style={styles.audioButton}
+      onPress={() => {
+        if (player.playing) {
+          player.pause();
+        } else {
+          player.play();
+        }
+      }}
+    >
+      <Ionicons
+        name={player.playing ? 'pause' : 'play'}
+        size={18}
+        color="#fff"
+      />
+      <Text style={styles.audioButtonText}>
+        {player.playing ? 'Pause' : 'Play'}
       </Text>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 
+export function ResourceCard({
+  item,
+  onOpenText,
+  onOpenPdf,
+  onOpenExternal,
+}: Props) {
+  const kind = getDisplayKind(item);
+  const id = getStableId(item);
+
+  let previewUrl: string | null = null;
+
+  if (kind === 'IMAGE' && item.url) {
+    previewUrl = item.url;
+  } else if (kind === 'VIDEO' && item.url && isYouTubeUrl(item.url)) {
+    previewUrl = getYouTubeThumb(item.url);
+  }
+
+  const handlePress = () => {
+    onOpenText(id);
+    
+    if (kind === 'TEXT') {
+      onOpenText(id);
+      return;
+    }
+
+    if (kind === 'PDF') {
+      onOpenPdf(id);
+      return;
+    }
+
+    onOpenText(id);
+  };
+
+  return (
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.75}
+      onPress={kind === 'AUDIO' ? undefined : handlePress}
+    >
+      {previewUrl ? (
+        <Image source={previewUrl} style={styles.preview} contentFit="cover" />
+      ) : null}
+
+      <View style={styles.iconBadge}>
+        {kind === 'TEXT' && <Ionicons name="document-text" size={16} color="#fff" />}
+        {kind === 'PDF' && <Ionicons name="document" size={16} color="#fff" />}
+        {kind === 'AUDIO' && <Ionicons name="musical-notes" size={16} color="#fff" />}
+        {kind === 'VIDEO' && <Ionicons name="logo-youtube" size={16} color="#fff" />}
+        {kind === 'IMAGE' && <Ionicons name="image" size={16} color="#fff" />}
+        {kind === 'LINK' && <Ionicons name="open-outline" size={16} color="#fff" />}
+      </View>
+
+      <Text style={styles.cardTitle} numberOfLines={2}>
+        {item.title}
+      </Text>
+
+      {kind === 'AUDIO' && item.url ? (
+        <AudioButton url={item.url} />
+      ) : (
+        <Text style={styles.cardMeta} numberOfLines={1}>
+          {kind}
+        </Text>
+      )}
+    </TouchableOpacity>
+  );
+}
+
+const CARD = '#17133A';
+
 const styles = StyleSheet.create({
-  card: { backgroundColor: '#111827', borderRadius: 16, padding: 12, marginBottom: 12 },
-  thumb: { width: '100%', height: 170, borderRadius: 12, marginBottom: 10 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  title: { color: '#F9FAFB', fontSize: 16, fontWeight: '700' },
-  desc: { color: '#9CA3AF', fontSize: 13, marginTop: 2 },
-  iconBadge: {
-    width: 36, height: 36, borderRadius: 10,
-    alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#7C3AED',
+  card: {
+    backgroundColor: CARD,
+    borderRadius: 18,
+    padding: 12,
+    marginBottom: 14,
+    width: '48%',
+    minHeight: 180,
+    justifyContent: 'flex-end',
+    overflow: 'hidden',
   },
-  hint: { color: '#9CA3AF', fontSize: 12, marginTop: 8 },
+  preview: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 96,
+  },
+  iconBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 30,
+    height: 30,
+    borderRadius: 10,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardTitle: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '900',
+    lineHeight: 20,
+  },
+  cardMeta: {
+    marginTop: 6,
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  audioButton: {
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 999,
+    gap: 6,
+  },
+  audioButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+  },
 });
