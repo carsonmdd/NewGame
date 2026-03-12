@@ -1,13 +1,16 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { resourceApi } from '@/lib/api';
 import { Resource, ResourceInput } from '@/types/resource';
 import ResourceForm from '@/components/ResourceForm';
 import Sidebar from '@/components/Sidebar';
 import ResourceCard from '@/components/ResourceCard';
+import CSVToolbar from '@/components/CSVToolbar';
+import { useResourceCSV } from '@/hooks/useResourceCSV';
 
 type TabKey = 'database' | 'review' | 'stats' | 'notifications';
+type OpenDropdown = null | 'newest' | 'language' | 'tags';
 
 export default function Home() {
 	const [activeTab, setActiveTab] = useState<TabKey>('database');
@@ -20,11 +23,15 @@ export default function Home() {
 		Resource | null | 'new'
 	>(null);
 
-	// UI-only controls (safe: no backend changes)
 	const [search, setSearch] = useState('');
-	const [sortNewest, setSortNewest] = useState(false);
-	const [sortLanguage, setSortLanguage] = useState(false);
-	const [sortTags, setSortTags] = useState(false);
+	const [newestOrder, setNewestOrder] = useState<'desc' | 'asc'>('desc');
+	const [selectedResourceType, setSelectedResourceType] = useState<
+		'all' | Resource['resourceType']
+	>('all');
+	const [selectedTag, setSelectedTag] = useState<'all' | string>('all');
+
+	const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
+	const dropdownWrapperRef = useRef<HTMLDivElement | null>(null);
 
 	const loadResources = async () => {
 		try {
@@ -39,8 +46,29 @@ export default function Home() {
 		}
 	};
 
+	const { handleExport, handleImport } = useResourceCSV(
+		resources,
+		loadResources,
+	);
+
 	useEffect(() => {
 		loadResources();
+	}, []);
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				dropdownWrapperRef.current &&
+				!dropdownWrapperRef.current.contains(event.target as Node)
+			) {
+				setOpenDropdown(null);
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
 	}, []);
 
 	const handleCreateOrUpdate = async (input: ResourceInput) => {
@@ -69,13 +97,67 @@ export default function Home() {
 		}
 	};
 
-	// IMPORTANT: Filtering is DISABLED for now.
-	// Search input is UI-only, does not affect displayed cards yet.
-	const displayedResources = useMemo(() => {
-		return resources;
+	const resourceTypes = useMemo(() => {
+		return Array.from(
+			new Set(resources.map((r) => r.resourceType)),
+		) as Resource['resourceType'][];
 	}, [resources]);
 
-	// Placeholder pages
+	const allTags = useMemo(() => {
+		return Array.from(new Set(resources.flatMap((r) => r.tags))).sort(
+			(a, b) => a.localeCompare(b),
+		);
+	}, [resources]);
+
+	const displayedResources = useMemo(() => {
+		let result = [...resources];
+
+		const normalizedSearch = search.trim().toLowerCase();
+
+		if (normalizedSearch) {
+			result = result.filter((resource) => {
+				const title = resource.title.toLowerCase();
+				const description = resource.description.toLowerCase();
+				const resourceType = resource.resourceType.toLowerCase();
+				const difficulty = resource.difficulty.toLowerCase();
+				const tagsText = resource.tags.join(' ').toLowerCase();
+
+				return (
+					title.includes(normalizedSearch) ||
+					description.includes(normalizedSearch) ||
+					resourceType.includes(normalizedSearch) ||
+					difficulty.includes(normalizedSearch) ||
+					tagsText.includes(normalizedSearch)
+				);
+			});
+		}
+
+		if (selectedResourceType !== 'all') {
+			result = result.filter(
+				(resource) => resource.resourceType === selectedResourceType,
+			);
+		}
+
+		if (selectedTag !== 'all') {
+			result = result.filter((resource) =>
+				resource.tags.includes(selectedTag),
+			);
+		}
+
+		result.sort((a, b) => {
+			const aTime = new Date(a.createdAt).getTime();
+			const bTime = new Date(b.createdAt).getTime();
+
+			if (newestOrder === 'desc') {
+				return bTime - aTime;
+			}
+
+			return aTime - bTime;
+		});
+
+		return result;
+	}, [resources, search, selectedResourceType, selectedTag, newestOrder]);
+
 	const Placeholder = ({ title }: { title: string }) => (
 		<div className="max-w-5xl">
 			<h1 className="text-2xl font-bold text-[#333333]">{title}</h1>
@@ -92,7 +174,6 @@ export default function Home() {
 				<Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
 				<main className="flex-1 p-8">
-					{/*  switch tabs to placeholder pages */}
 					{activeTab === 'review' && (
 						<Placeholder title="Resources for Review" />
 					)}
@@ -104,10 +185,9 @@ export default function Home() {
 					)}
 
 					{activeTab === 'database' && (
-						<div className="max-w-6xl mx-auto">
-							{/* Top row: search + filter icon + plus */}
-							<div className="flex items-center gap-4">
-								<div className="flex-1">
+						<div className="max-w-6xl mx-auto" ref={dropdownWrapperRef}>
+							<div className="flex items-center gap-4 flex-wrap">
+								<div className="flex-1 min-w-[320px]">
 									<div className="flex items-center gap-3 bg-white border rounded-2xl px-4 py-3 shadow-sm">
 										<span
 											className="text-slate-500"
@@ -121,19 +201,24 @@ export default function Home() {
 												setSearch(e.target.value)
 											}
 											placeholder="Search for resources"
-											className="w-full outline-none text-[#333333]"
+											className="w-full outline-none text-[#333333] bg-transparent"
 										/>
 										<button
 											type="button"
 											className="text-slate-500 hover:text-slate-800"
-											aria-label="Filter options (placeholder)"
-											title="Filters later"
-											onClick={() => {}}
+											aria-label="Clear search"
+											title="Clear search"
+											onClick={() => setSearch('')}
 										>
-											🎛️
+											✕
 										</button>
 									</div>
 								</div>
+
+								<CSVToolbar
+									onExport={handleExport}
+									onImport={handleImport}
+								/>
 
 								<button
 									type="button"
@@ -146,39 +231,200 @@ export default function Home() {
 								</button>
 							</div>
 
-							{/* Sort buttons row (UI-only for now) */}
 							<div className="mt-6 flex gap-6">
-								<button
-									type="button"
-									onClick={() => setSortNewest((v) => !v)}
-									className="flex-1 bg-[#8C4D93] text-white py-3 rounded-xl font-semibold"
-								>
-									Sort by Newest {sortNewest ? '▲' : '▼'}
-								</button>
-								<button
-									type="button"
-									onClick={() => setSortLanguage((v) => !v)}
-									className="flex-1 bg-[#8C4D93] text-white py-3 rounded-xl font-semibold"
-								>
-									Sort by Language {sortLanguage ? '▲' : '▼'}
-								</button>
-								<button
-									type="button"
-									onClick={() => setSortTags((v) => !v)}
-									className="flex-1 bg-[#8C4D93] text-white py-3 rounded-xl font-semibold"
-								>
-									Sort by tags {sortTags ? '▲' : '▼'}
-								</button>
+								<div className="relative flex-1">
+									<button
+										type="button"
+										onClick={() =>
+											setOpenDropdown((prev) =>
+												prev === 'newest'
+													? null
+													: 'newest',
+											)
+										}
+										className="w-full bg-[#8C4D93] text-white py-3 rounded-xl font-semibold"
+									>
+										Sort by Newest
+									</button>
+
+									{openDropdown === 'newest' && (
+										<div className="absolute top-full left-0 mt-2 w-full rounded-xl border border-[#8C4D93] bg-white shadow-lg z-30 overflow-hidden">
+											<button
+												type="button"
+												onClick={() => {
+													setNewestOrder('desc');
+													setOpenDropdown(null);
+												}}
+												className={`w-full px-4 py-3 text-left text-[#333333] hover:bg-[#F3EAF8] ${
+													newestOrder === 'desc'
+														? 'bg-[#F3EAF8] font-semibold text-[#333333]'
+														: ''
+												}`}
+											>
+												Newest first
+											</button>
+											<button
+												type="button"
+												onClick={() => {
+													setNewestOrder('asc');
+													setOpenDropdown(null);
+												}}
+												className={`w-full px-4 py-3 text-left text-[#333333] hover:bg-[#F3EAF8] ${
+													newestOrder === 'asc'
+														? 'bg-[#F3EAF8] font-semibold text-[#333333]'
+														: ''
+												}`}
+											>
+												Oldest first
+											</button>
+										</div>
+									)}
+								</div>
+
+								<div className="relative flex-1">
+									<button
+										type="button"
+										onClick={() =>
+											setOpenDropdown((prev) =>
+												prev === 'language'
+													? null
+													: 'language',
+											)
+										}
+										className="w-full bg-[#8C4D93] text-white py-3 rounded-xl font-semibold"
+									>
+										Sort by Language
+									</button>
+
+									{openDropdown === 'language' && (
+										<div className="absolute top-full left-0 mt-2 w-full rounded-xl border border-[#8C4D93] bg-white shadow-lg z-30 overflow-hidden max-h-72 overflow-y-auto">
+											<button
+												type="button"
+												onClick={() => {
+													setSelectedResourceType('all');
+													setOpenDropdown(null);
+												}}
+												className={`w-full px-4 py-3 text-left text-[#333333] hover:bg-[#F3EAF8] ${
+													selectedResourceType === 'all'
+														? 'bg-[#F3EAF8] font-semibold text-[#333333]'
+														: ''
+												}`}
+											>
+												All
+											</button>
+
+											{resourceTypes.map((type) => (
+												<button
+													key={type}
+													type="button"
+													onClick={() => {
+														setSelectedResourceType(
+															type,
+														);
+														setOpenDropdown(null);
+													}}
+													className={`w-full px-4 py-3 text-left text-[#333333] hover:bg-[#F3EAF8] capitalize ${
+														selectedResourceType ===
+														type
+															? 'bg-[#F3EAF8] font-semibold text-[#333333]'
+															: ''
+													}`}
+												>
+													{type}
+												</button>
+											))}
+										</div>
+									)}
+								</div>
+
+								<div className="relative flex-1">
+									<button
+										type="button"
+										onClick={() =>
+											setOpenDropdown((prev) =>
+												prev === 'tags'
+													? null
+													: 'tags',
+											)
+										}
+										className="w-full bg-[#8C4D93] text-white py-3 rounded-xl font-semibold"
+									>
+										Sort by tags
+									</button>
+
+									{openDropdown === 'tags' && (
+										<div className="absolute top-full left-0 mt-2 w-full rounded-xl border border-[#8C4D93] bg-white shadow-lg z-30 overflow-hidden max-h-72 overflow-y-auto">
+											<button
+												type="button"
+												onClick={() => {
+													setSelectedTag('all');
+													setOpenDropdown(null);
+												}}
+												className={`w-full px-4 py-3 text-left text-[#333333] hover:bg-[#F3EAF8] ${
+													selectedTag === 'all'
+														? 'bg-[#F3EAF8] font-semibold text-[#333333]'
+														: ''
+												}`}
+											>
+												All
+											</button>
+
+											{allTags.map((tag) => (
+												<button
+													key={tag}
+													type="button"
+													onClick={() => {
+														setSelectedTag(tag);
+														setOpenDropdown(null);
+													}}
+													className={`w-full px-4 py-3 text-left text-[#333333] hover:bg-[#F3EAF8] ${
+														selectedTag === tag
+															? 'bg-[#F3EAF8] font-semibold text-[#333333]'
+															: ''
+													}`}
+												>
+													{tag}
+												</button>
+											))}
+										</div>
+									)}
+								</div>
 							</div>
 
-							{/* Error / loading */}
 							{loading && <div className="mt-8">Loading...</div>}
 							{error && (
 								<p className="text-red-600 mt-6">{error}</p>
 							)}
 
-							{/* Card list container */}
 							<div className="mt-6 rounded-2xl bg-white border p-6">
+								<div className="mb-4 flex items-center justify-between text-sm text-slate-600">
+									<p>
+										Showing{' '}
+										<span className="font-semibold">
+											{displayedResources.length}
+										</span>{' '}
+										of{' '}
+										<span className="font-semibold">
+											{resources.length}
+										</span>{' '}
+										resources
+									</p>
+
+									<button
+										type="button"
+										onClick={() => {
+											setSearch('');
+											setNewestOrder('desc');
+											setSelectedResourceType('all');
+											setSelectedTag('all');
+											setOpenDropdown(null);
+										}}
+										className="text-[#8C4D93] font-medium hover:underline"
+									>
+										Clear all
+									</button>
+								</div>
+
 								<div className="max-h-[540px] overflow-y-auto pr-2 space-y-5">
 									{displayedResources.map((r) => (
 										<ResourceCard
@@ -191,17 +437,23 @@ export default function Home() {
 										/>
 									))}
 
-									{/* Only show empty state when there are literally no resources */}
+									{!loading &&
+										displayedResources.length === 0 &&
+										resources.length > 0 && (
+											<p className="text-slate-600">
+												No matching resources found.
+											</p>
+										)}
+
 									{!loading && resources.length === 0 && (
 										<p className="text-slate-600">
-											No resources yet. Click the “+”
+											No resources yet. Click the "+"
 											button to add one.
 										</p>
 									)}
 								</div>
 							</div>
 
-							{/* Modal: ResourceForm (Create/Edit) */}
 							{editingResource && (
 								<div className="fixed inset-0 bg-black/40 flex items-center justify-center p-6 z-50">
 									<div className="w-full max-w-2xl">
