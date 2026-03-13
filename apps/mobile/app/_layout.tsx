@@ -1,3 +1,5 @@
+import '../global.css';
+
 import { SavedResourcesProvider } from '@/contexts/SavedResourcesContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { INDEX_NAME, searchClient } from '@/lib/algolia';
@@ -21,34 +23,44 @@ export default function RootLayout() {
 	const colorScheme = useColorScheme();
 
 	return (
-		<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+		<ThemeProvider
+			value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+		>
 			<SafeAreaProvider>
-				<InstantSearch searchClient={searchClient} indexName={INDEX_NAME} 
+				<InstantSearch
+					searchClient={searchClient}
+					indexName={INDEX_NAME}
 					future={{ preserveSharedStateOnUnmount: true }}
 				>
 					<SavedResourcesProvider>
-					<Stack>
-						<Stack.Screen
-							name="(tabs)"
-							options={{ headerShown: false }}
-						/>
+						<Stack>
+							<Stack.Screen
+								name="(tabs)"
+								options={{ headerShown: false }}
+							/>
 
-						{/* Search-only filter screen (opened from the Search tab) */}
-						<Stack.Screen
-							name="filter"
-							options={{ presentation: 'modal', headerShown: false }}
-						/>
+							{/* Search-only filter screen (opened from the Search tab) */}
+							<Stack.Screen
+								name="filter"
+								options={{
+									presentation: 'modal',
+									headerShown: false,
+								}}
+							/>
 
-						<Stack.Screen
-							name="modal"
-							options={{ presentation: 'modal', title: 'Modal' }}
-						/>
+							<Stack.Screen
+								name="modal"
+								options={{
+									presentation: 'modal',
+									title: 'Modal',
+								}}
+							/>
 
-						<Stack.Screen 
-							name="resource/[id]" 
-							options={{ headerShown: false }} 
-						/>
-					</Stack>
+							<Stack.Screen
+								name="resource/[id]"
+								options={{ headerShown: false }}
+							/>
+						</Stack>
 					</SavedResourcesProvider>
 				</InstantSearch>
 				<StatusBar style="auto" />
