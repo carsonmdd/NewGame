@@ -12,6 +12,7 @@ export function LinearText({
 	gradient = false,
 	children,
 	style,
+	className,
 	...props
 }: LinearTextProps) {
 	const variantStyles: Record<string, string> = {
@@ -25,26 +26,11 @@ export function LinearText({
 		label: 'text-xs font-mono tracking-widest uppercase text-foreground-muted',
 	};
 
-	const className = variantStyles[variant] || variantStyles.body;
-
-	if (gradient) {
-		return (
-			<Text
-				className={`${className} ${props.className || ''}`}
-				style={style}
-				{...props}
-			>
-				{children}
-			</Text>
-		);
-	}
+	const baseClass = variantStyles[variant] || variantStyles.body;
+	const combinedClassName = `${baseClass} ${className || ''}`;
 
 	return (
-		<Text
-			className={`${className} ${props.className || ''}`}
-			style={style}
-			{...props}
-		>
+		<Text {...props} className={combinedClassName} style={style}>
 			{children}
 		</Text>
 	);

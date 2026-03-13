@@ -56,10 +56,15 @@ export default function HomeScreen() {
 			<SafeAreaView edges={['top']} className="flex-1">
 				<View className="px-6 py-4 flex-row justify-between items-center">
 					<View>
-						<LinearText variant="label" className="text-accent tracking-[0.2em] mb-1">DISCOVER</LinearText>
+						<LinearText
+							variant="label"
+							className="text-accent tracking-[0.2em] mb-1"
+						>
+							DISCOVER
+						</LinearText>
 						<LinearText variant="h2">Home</LinearText>
 					</View>
-					<TouchableOpacity 
+					<TouchableOpacity
 						onPress={loadResources}
 						className="w-10 h-10 items-center justify-center rounded-xl bg-white/5 border border-white/10"
 					>
@@ -73,7 +78,12 @@ export default function HomeScreen() {
 				>
 					{error ? (
 						<View className="py-20 items-center px-10">
-							<LinearText variant="body" className="text-red-400 text-center mb-6">{error}</LinearText>
+							<LinearText
+								variant="body"
+								className="text-red-400 text-center mb-6"
+							>
+								{error}
+							</LinearText>
 							<LinearButton
 								title="Retry"
 								onPress={loadResources}
@@ -86,7 +96,9 @@ export default function HomeScreen() {
 					<View className="mb-10">
 						<View className="flex-row items-center mb-5">
 							<TrendingUp size={18} color="#5E6AD2" />
-							<LinearText variant="h3" className="ml-3">Trending</LinearText>
+							<LinearText variant="h3" className="ml-3">
+								Trending
+							</LinearText>
 						</View>
 
 						{loading && trending.length === 0 ? (
@@ -105,7 +117,10 @@ export default function HomeScreen() {
 										intensity={15}
 										containerClassName="h-48 justify-end p-6 border-white/5"
 									>
-										<LinearText variant="label" className="text-accent/80 mb-2">
+										<LinearText
+											variant="label"
+											className="text-accent/80 mb-2"
+										>
 											{item.sourceType || 'TRENDING'}
 										</LinearText>
 										<LinearText
@@ -117,10 +132,17 @@ export default function HomeScreen() {
 										</LinearText>
 										<View className="flex-row items-center mt-4">
 											<View className="w-6 h-6 rounded-full bg-accent/20 items-center justify-center mr-2">
-												<User size={12} color="#5E6AD2" />
+												<User
+													size={12}
+													color="#5E6AD2"
+												/>
 											</View>
-											<LinearText variant="body" className="text-foreground-muted text-xs">
-												{item.author || 'Unknown Author'}
+											<LinearText
+												variant="body"
+												className="text-foreground-muted text-xs"
+											>
+												{item.author ||
+													'Unknown Author'}
 											</LinearText>
 										</View>
 									</LinearCard>
@@ -133,7 +155,9 @@ export default function HomeScreen() {
 					<View className="mb-10">
 						<View className="flex-row items-center mb-5">
 							<Clock size={18} color="#5E6AD2" />
-							<LinearText variant="h3" className="ml-3">Latest</LinearText>
+							<LinearText variant="h3" className="ml-3">
+								Latest
+							</LinearText>
 						</View>
 
 						{loading && latest.length === 0 ? (
@@ -152,7 +176,10 @@ export default function HomeScreen() {
 										intensity={10}
 										containerClassName="h-40 justify-end p-6 border-white/5"
 									>
-										<LinearText variant="label" className="text-foreground-subtle mb-2">
+										<LinearText
+											variant="label"
+											className="text-foreground-subtle mb-2"
+										>
 											{item.sourceType || 'LATEST'}
 										</LinearText>
 										<LinearText
