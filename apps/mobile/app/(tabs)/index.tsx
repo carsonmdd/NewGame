@@ -41,8 +41,6 @@ export default function HomeScreen() {
 			>
 				<View style={styles.headerRow}>
 					<Text style={styles.homeTitle}>Home</Text>
-
-					<View style={styles.avatar} />
 				</View>
 
 				<View style={styles.section}>
@@ -117,12 +115,6 @@ const styles = StyleSheet.create({
 		color: '#FFFFFF',
 		fontSize: 24,
 		fontWeight: '700',
-	},
-	avatar: {
-		width: 42,
-		height: 42,
-		borderRadius: 21,
-		backgroundColor: '#D9D9D9',
 	},
 	section: {
 		marginBottom: 24,

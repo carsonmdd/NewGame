@@ -6,15 +6,17 @@ import { AlgoliaSearchBox } from '@/components/AlgoliaSearchBox';
 import { AlgoliaHits } from '@/components/AlgoliaHits';
 
 import { AlgoliaFilterWidgets } from '@/components/AlgoliaFilterWidgets';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+	SafeAreaView,
+	useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 export default function SearchScreen() {
 	const insets = useSafeAreaInsets();
 
 	return (
 		<SafeAreaView style={styles.safe} edges={['left', 'right']}>
-			<View style={[styles.container, { paddingTop: insets.top }] }>
-
+			<View style={[styles.container, { paddingTop: insets.top }]}>
 				{/* Keep Filters Updated */}
 				<AlgoliaFilterWidgets />
 
@@ -22,13 +24,8 @@ export default function SearchScreen() {
 					contentContainerStyle={styles.scrollContent}
 					showsVerticalScrollIndicator={false}
 				>
-					{/* Top bar: big Search + avatar */}
 					<View style={styles.topBar}>
 						<Text style={styles.screenLabel}>Search</Text>
-
-						<View style={styles.avatarCircle}>
-							<Ionicons name="person" size={18} color="#111" />
-						</View>
 					</View>
 
 					{/* Search bar with Algolia */}
@@ -47,8 +44,8 @@ const CARD = '#17133A';
 
 const styles = StyleSheet.create({
 	safe: {
-    flex: 1,
-    backgroundColor: BG,
+		flex: 1,
+		backgroundColor: BG,
 	},
 	container: {
 		flex: 1,
@@ -71,14 +68,6 @@ const styles = StyleSheet.create({
 		color: '#FFFFFF',
 		fontSize: 34,
 		fontWeight: '900',
-	},
-	avatarCircle: {
-		width: 36,
-		height: 36,
-		borderRadius: 18,
-		backgroundColor: '#E9F1FF',
-		alignItems: 'center',
-		justifyContent: 'center',
 	},
 
 	// Sections
