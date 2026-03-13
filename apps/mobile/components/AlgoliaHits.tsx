@@ -20,8 +20,8 @@ export function AlgoliaHits(props: UseHitsProps<Resource>) {
     }
 
     return [...hits].sort((a, b) => {
-      const aTime = Date.parse(a.createdAt ?? '');
-      const bTime = Date.parse(b.createdAt ?? '');
+      const aTime = Date.parse(a.date || a.createdAt || '');
+      const bTime = Date.parse(b.date || b.createdAt || '');
 
       const safeATime = Number.isNaN(aTime) ? 0 : aTime;
       const safeBTime = Number.isNaN(bTime) ? 0 : bTime;
