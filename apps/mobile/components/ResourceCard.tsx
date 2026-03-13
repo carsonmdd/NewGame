@@ -9,19 +9,24 @@ import { CustomText } from './CustomText';
 
 type Props = {
 	item: Resource;
+	onPress?: (item: Resource) => void;
 };
 
-export function ResourceCard({ item }: Props) {
+export function ResourceCard({ item, onPress }: Props) {
 	const router = useRouter();
 
 	const handlePress = () => {
-		router.push({
-			pathname: '/resource/[id]',
-			params: {
-				id: item.id,
-				resource: JSON.stringify(item),
-			},
-		});
+		if (onPress) {
+			onPress(item);
+		} else {
+			router.push({
+				pathname: '/resource/[id]',
+				params: {
+					id: item.id,
+					resource: JSON.stringify(item),
+				},
+			});
+		}
 	};
 
 	return (
@@ -35,7 +40,7 @@ export function ResourceCard({ item }: Props) {
 				intensity={12}
 				containerClassName="min-h-[190px] justify-between border-white/5 bg-white/[0.02]"
 			>
-				{/* Top Header - Icon is now consistently top-right */}
+				{/* Top Header */}
 				<View className="flex-row justify-between items-start">
 					<View className="flex-1 mr-8">
 						{item.sourceType && (
@@ -82,7 +87,6 @@ export function ResourceCard({ item }: Props) {
 
 const styles = StyleSheet.create({
 	cardContainer: {
-		// Ensure the card feels cohesive
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 8 },
 		shadowOpacity: 0.2,

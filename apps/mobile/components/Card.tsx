@@ -38,7 +38,7 @@ export function Card({
 				style={styles.highlight}
 			/>
 
-			<View className="p-4">{children}</View>
+			<View className="p-4 flex-1">{children}</View>
 		</View>
 	);
 }
