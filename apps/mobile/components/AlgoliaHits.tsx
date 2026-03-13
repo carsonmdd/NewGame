@@ -5,7 +5,6 @@ import { Text, View } from 'react-native';
 
 import { ResourceCard } from '@/components/ResourceCard';
 import { Resource } from '@/types/resource';
-import { getStableId } from '@/utils/resourceRender';
 import { getSearchSortMode } from '@/lib/searchSort';
 
 export function AlgoliaHits(props: UseHitsProps<Resource>) {
@@ -31,43 +30,17 @@ export function AlgoliaHits(props: UseHitsProps<Resource>) {
 	}, [hits]);
 
 	if (visibleHits.length === 0) {
-		return <Text className="text-white/65 text-[13px] mb-2">No resources found.</Text>;
+		return (
+			<Text className="text-white/65 text-[13px] mb-2">
+				No resources found.
+			</Text>
+		);
 	}
 
 	return (
 		<View className="flex-row flex-wrap justify-between">
 			{visibleHits.map((item) => (
-				<ResourceCard
-					key={getStableId(item)}
-					item={item}
-					onOpenText={(id) =>
-						router.push({
-							pathname: '/resource/[id]',
-							params: {
-								id: item.objectID || item.id,
-								resource: JSON.stringify(item),
-							},
-						})
-					}
-					onOpenPdf={(id) =>
-						router.push({
-							pathname: '/resource/[id]',
-							params: {
-								id: item.objectID || item.id,
-								resource: JSON.stringify(item),
-							},
-						})
-					}
-					onOpenExternal={(_url) =>
-						router.push({
-							pathname: '/resource/[id]',
-							params: {
-								id: item.objectID || item.id,
-								resource: JSON.stringify(item),
-							},
-						})
-					}
-				/>
+				<ResourceCard key={item.id} item={item} />
 			))}
 		</View>
 	);
