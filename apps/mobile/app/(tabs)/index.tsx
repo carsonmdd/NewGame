@@ -15,6 +15,7 @@ import { LinearBackground } from '@/components/ui/linear/LinearBackground';
 import { LinearCard } from '@/components/ui/linear/LinearCard';
 import { LinearText } from '@/components/ui/linear/LinearText';
 import { LinearButton } from '@/components/ui/linear/LinearButton';
+import HomeCard from '@/components/HomeCard';
 
 export default function HomeScreen() {
 	const [trending, setTrending] = useState<Resource[]>([]);
@@ -106,47 +107,12 @@ export default function HomeScreen() {
 								<ActivityIndicator color="#5E6AD2" />
 							</View>
 						) : (
-							trending.map((item) => (
-								<TouchableOpacity
-									key={item.id}
-									activeOpacity={0.85}
-									onPress={() => handleResourcePress(item)}
-									className="mb-5"
-								>
-									<LinearCard
-										intensity={15}
-										containerClassName="h-48 justify-end p-6 border-white/5"
-									>
-										<LinearText
-											variant="label"
-											className="text-accent/80 mb-2"
-										>
-											{item.sourceType || 'TRENDING'}
-										</LinearText>
-										<LinearText
-											variant="h3"
-											className="text-lg font-bold leading-tight"
-											numberOfLines={2}
-										>
-											{item.title}
-										</LinearText>
-										<View className="flex-row items-center mt-4">
-											<View className="w-6 h-6 rounded-full bg-accent/20 items-center justify-center mr-2">
-												<User
-													size={12}
-													color="#5E6AD2"
-												/>
-											</View>
-											<LinearText
-												variant="body"
-												className="text-foreground-muted text-xs"
-											>
-												{item.author ||
-													'Unknown Author'}
-											</LinearText>
-										</View>
-									</LinearCard>
-								</TouchableOpacity>
+							trending.map((item, index) => (
+								<HomeCard
+									key={index}
+									item={item}
+									handleResourcePress={handleResourcePress}
+								/>
 							))
 						)}
 					</View>
@@ -165,32 +131,12 @@ export default function HomeScreen() {
 								<ActivityIndicator color="#5E6AD2" />
 							</View>
 						) : (
-							latest.map((item) => (
-								<TouchableOpacity
-									key={item.id}
-									activeOpacity={0.85}
-									onPress={() => handleResourcePress(item)}
-									className="mb-5"
-								>
-									<LinearCard
-										intensity={10}
-										containerClassName="h-40 justify-end p-6 border-white/5"
-									>
-										<LinearText
-											variant="label"
-											className="text-foreground-subtle mb-2"
-										>
-											{item.sourceType || 'LATEST'}
-										</LinearText>
-										<LinearText
-											variant="h3"
-											className="text-base font-bold leading-tight"
-											numberOfLines={2}
-										>
-											{item.title}
-										</LinearText>
-									</LinearCard>
-								</TouchableOpacity>
+							latest.map((item, index) => (
+								<HomeCard
+									key={index}
+									item={item}
+									handleResourcePress={handleResourcePress}
+								/>
 							))
 						)}
 					</View>
