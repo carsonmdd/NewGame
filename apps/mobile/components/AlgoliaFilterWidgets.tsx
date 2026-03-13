@@ -1,4 +1,3 @@
-import React from 'react';
 import { useRefinementList } from 'react-instantsearch-core';
 
 /**
@@ -7,7 +6,7 @@ import { useRefinementList } from 'react-instantsearch-core';
  */
 
 export function AlgoliaFilterWidgets() {
-  useRefinementList({ attribute: 'keywords' });
+	useRefinementList({ attribute: 'keywords' });
 
-  return null;
+	return null;
 }

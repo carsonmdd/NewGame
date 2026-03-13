@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo } from 'react';
-import { StyleSheet, TextInput, View, TouchableOpacity } from 'react-native';
+import { TextInput, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
 	useSearchBox,
@@ -30,16 +30,16 @@ export function AlgoliaSearchBox(props: UseSearchBoxProps) {
 	}
 
 	return (
-		<View style={styles.searchBar}>
+		<View className="flex-row items-center bg-white/10 rounded-full px-3.5 h-[44px] mb-4">
 			<Ionicons
 				name="search"
 				size={18}
 				color="#F9FAFB"
-				style={styles.searchIcon}
+				className="mr-2.5"
 			/>
 			<TextInput
 				ref={inputRef}
-				style={styles.searchInput}
+				className="flex-1 text-white text-[14px]"
 				placeholder="Search for resources..."
 				placeholderTextColor="#E5E7EB"
 				value={inputValue}
@@ -55,10 +55,7 @@ export function AlgoliaSearchBox(props: UseSearchBoxProps) {
 				accessibilityRole="button"
 				accessibilityLabel="Open filters"
 				activeOpacity={0.7}
-				style={[
-					styles.filterBtn,
-					hasActiveFilters && styles.filterBtnActive,
-				]}
+				className={`ml-2 p-1.5 rounded-full ${hasActiveFilters ? 'bg-[#F9FAFB]' : ''}`}
 				onPress={() => router.push('../filter')}
 			>
 				<Ionicons
@@ -70,31 +67,3 @@ export function AlgoliaSearchBox(props: UseSearchBoxProps) {
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	searchBar: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: 'rgba(255,255,255,0.12)',
-		borderRadius: 999,
-		paddingHorizontal: 14,
-		height: 44,
-		marginBottom: 16,
-	},
-	searchIcon: {
-		marginRight: 10,
-	},
-	searchInput: {
-		flex: 1,
-		color: '#FFFFFF',
-		fontSize: 14,
-	},
-	filterBtn: {
-		marginLeft: 8,
-		padding: 6,
-		borderRadius: 999,
-	},
-	filterBtnActive: {
-		backgroundColor: '#F9FAFB',
-	},
-});

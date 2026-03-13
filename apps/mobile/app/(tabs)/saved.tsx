@@ -6,7 +6,6 @@ import {
 	FlatList,
 	Modal,
 	ScrollView,
-	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
@@ -33,10 +32,8 @@ type ModalTile =
 	| { id: string; kind: 'add' }
 	| { id: string; kind: 'resource'; resource: Resource };
 
-const BG = '#050509';
 const TEXT = '#F9FAFB';
 const MUTED = '#9CA3AF';
-const INPUT = '#2A2A2A';
 
 const NAME_MAX = 22;
 
@@ -206,40 +203,40 @@ export default function SavedScreen() {
 	}, [openCollection, filteredSavedResources]);
 
 	return (
-		<SafeAreaView style={styles.safe} edges={['left', 'right']}>
-			<View style={[styles.container, { paddingTop: insets.top }]}>
+		<SafeAreaView className="flex-1 bg-[#050509]" edges={['left', 'right']}>
+			<View className="flex-1 bg-[#050509] px-5" style={{ paddingTop: insets.top }}>
 				<ScrollView
-					contentContainerStyle={styles.scrollContent}
+					contentContainerClassName="pb-6"
 					showsVerticalScrollIndicator={false}
 				>
-					<View style={styles.headerRow}>
-						<Text style={styles.headerTitle}>Saved</Text>
+					<View className="flex-row items-center justify-between mb-1.5 mt-0.5">
+						<Text className="text-[#F9FAFB] text-[32px] font-extrabold tracking-tight leading-[38px]">Saved</Text>
 					</View>
 
-					<Text style={styles.sectionTitle}>Collections</Text>
+					<Text className="text-[#F9FAFB] text-[30px] font-extrabold mt-0 mb-3 leading-[36px]">Collections</Text>
 
-					<View style={styles.gridWrap}>
+					<View className="pb-3">
 						{collectionRows.map((row, rowIndex) => (
 							<View
 								key={`row-${rowIndex}`}
-								style={styles.columnWrap}
+								className="flex-row gap-[18px] mb-[18px]"
 							>
 								{row.map((item) => {
 									if (item.kind === 'add') {
 										return (
 											<View
 												key={item.id}
-												style={styles.addTileWrap}
+												className="flex-1 items-start"
 											>
 												<TouchableOpacity
 													activeOpacity={0.85}
 													onPress={addCollection}
-													style={styles.addTile}
+													className="w-[165px] h-[165px] rounded-full bg-[#2E2E2E] items-center justify-center"
 													accessibilityRole="button"
 													accessibilityLabel="Create new collection"
 												>
 													<Text
-														style={styles.addPlus}
+														className="text-[#F9FAFB] text-[72px] font-extralight -mt-1.5"
 													>
 														+
 													</Text>
@@ -256,15 +253,15 @@ export default function SavedScreen() {
 											onPress={() =>
 												openModalForCollection(c)
 											}
-											style={styles.collectionTile}
+											className="flex-1"
 											accessibilityRole="button"
 											accessibilityLabel={`Open collection ${c.name}`}
 										>
 											<View
-												style={styles.collectionSquare}
+												className="w-full h-[165px] rounded-[28px] bg-[#1A1F4A] mb-2.5"
 											/>
 											<Text
-												style={styles.collectionName}
+												className="text-[#F9FAFB] text-[22px] font-bold"
 												numberOfLines={1}
 											>
 												{c.name}
@@ -275,7 +272,7 @@ export default function SavedScreen() {
 
 								{/* Spacer when row has only one item */}
 								{row.length === 1 ? (
-									<View style={styles.rowSpacer} />
+									<View className="flex-1" />
 								) : null}
 							</View>
 						))}
@@ -289,19 +286,17 @@ export default function SavedScreen() {
 					onRequestClose={closeModal}
 				>
 					<SafeAreaView
-						style={styles.modalSafe}
+						className="flex-1 bg-[#050509]"
 						edges={['left', 'right']}
 					>
 						<View
-							style={[
-								styles.modalContainer,
-								{ paddingTop: insets.top },
-							]}
+							className="flex-1 bg-[#050509]"
+							style={{ paddingTop: insets.top }}
 						>
-							<View style={styles.modalHeader}>
-								<View style={styles.modalTitleRow}>
+							<View className="px-5 pt-1 pb-2.5 flex-row items-start justify-between">
+								<View className="flex-1 pr-2.5">
 									{openCollection?.id === 'recent' ? (
-										<Text style={styles.modalTitle}>
+										<Text className="text-[#F9FAFB] text-[30px] font-extrabold leading-[36px]">
 											{openCollectionName}
 										</Text>
 									) : !isEditingTitle ? (
@@ -310,17 +305,17 @@ export default function SavedScreen() {
 											onPress={startEditingTitle}
 											accessibilityRole="button"
 											accessibilityLabel="Edit collection name"
-											style={styles.modalTitleTap}
+											className="py-1"
 										>
 											<Text
-												style={styles.modalTitle}
+												className="text-[#F9FAFB] text-[30px] font-extrabold leading-[36px]"
 												numberOfLines={1}
 											>
 												{openCollectionName}
 											</Text>
 										</TouchableOpacity>
 									) : (
-										<View style={styles.modalTitleEditWrap}>
+										<View className="pt-0.5">
 											<TextInput
 												value={draftName}
 												onChangeText={(t) =>
@@ -328,7 +323,7 @@ export default function SavedScreen() {
 														sanitizeName(t),
 													)
 												}
-												style={styles.modalTitleInput}
+												className="text-[#F9FAFB] text-[28px] font-extrabold leading-[34px] py-1 px-0"
 												placeholder="Collection name"
 												placeholderTextColor={MUTED}
 												autoFocus
@@ -337,7 +332,7 @@ export default function SavedScreen() {
 												onSubmitEditing={saveTitle}
 												autoCorrect={false}
 											/>
-											<Text style={styles.editHelpText}>
+											<Text className="text-[#9CA3AF] text-[12px] mt-1">
 												Letters, numbers, spaces. Max{' '}
 												{NAME_MAX} characters.
 											</Text>
@@ -345,14 +340,14 @@ export default function SavedScreen() {
 									)}
 								</View>
 
-								<View style={styles.modalHeaderBtns}>
+								<View className="flex-row gap-2.5 items-center">
 									{openCollection?.id !== 'recent' && (
 										<TouchableOpacity
 											accessibilityRole="button"
 											accessibilityLabel="Delete collection"
 											activeOpacity={0.8}
 											onPress={deleteCollection}
-											style={styles.iconBtn}
+											className="p-2 rounded-full"
 										>
 											<Ionicons
 												name="trash-outline"
@@ -367,7 +362,7 @@ export default function SavedScreen() {
 										accessibilityLabel="Close collection"
 										activeOpacity={0.8}
 										onPress={closeModal}
-										style={styles.iconBtn}
+										className="p-2 rounded-full"
 									>
 										<Ionicons
 											name="close"
@@ -379,19 +374,16 @@ export default function SavedScreen() {
 							</View>
 
 							{isEditingTitle && (
-								<View style={styles.editActionsRow}>
+								<View className="px-5 flex-row gap-2.5 mt-1 mb-1.5">
 									<TouchableOpacity
 										activeOpacity={0.85}
 										onPress={() => {
 											setDraftName(openCollectionName);
 											setIsEditingTitle(false);
 										}}
-										style={[
-											styles.editBtn,
-											styles.editBtnGhost,
-										]}
+										className="flex-1 h-10 rounded-full items-center justify-center border border-[#F9FAFB] bg-transparent"
 									>
-										<Text style={styles.editBtnText}>
+										<Text className="text-[#F9FAFB] text-[13px] font-extrabold">
 											Cancel
 										</Text>
 									</TouchableOpacity>
@@ -399,16 +391,10 @@ export default function SavedScreen() {
 									<TouchableOpacity
 										activeOpacity={0.85}
 										onPress={saveTitle}
-										style={[
-											styles.editBtn,
-											styles.editBtnSolid,
-										]}
+										className="flex-1 h-10 rounded-full items-center justify-center bg-[#F9FAFB]"
 									>
 										<Text
-											style={[
-												styles.editBtnText,
-												{ color: '#0B0B10' },
-											]}
+											className="text-[13px] font-extrabold text-[#0B0B10]"
 										>
 											Save
 										</Text>
@@ -416,20 +402,20 @@ export default function SavedScreen() {
 								</View>
 							)}
 
-							<View style={styles.modalSearchRow}>
-								<View style={styles.modalSearchBar}>
+							<View className="px-5 flex-row items-center gap-3 mt-2.5">
+								<View className="flex-1 flex-row items-center bg-[#2A2A2A] rounded-[14px] px-3.5 h-11">
 									<Ionicons
 										name="search"
 										size={18}
 										color={MUTED}
-										style={{ marginRight: 8 }}
+										className="mr-2"
 									/>
 									<TextInput
 										value={collectionSearch}
 										onChangeText={setCollectionSearch}
 										placeholder="Search your collection"
 										placeholderTextColor={MUTED}
-										style={styles.modalSearchInput}
+										className="flex-1 text-[#F9FAFB] text-base py-0"
 										returnKeyType="search"
 									/>
 								</View>
@@ -439,7 +425,7 @@ export default function SavedScreen() {
 									onPress={() => {}}
 									accessibilityRole="button"
 									accessibilityLabel="Collection filters (not implemented)"
-									style={styles.modalFilterBtn}
+									className="w-[52px] h-11 rounded-[14px] bg-[#2A2A2A] items-center justify-center"
 								>
 									<Ionicons
 										name="options-outline"
@@ -450,23 +436,23 @@ export default function SavedScreen() {
 							</View>
 
 							<FlatList
-								contentContainerStyle={styles.modalGrid}
+								contentContainerClassName="px-5 pt-5.5 pb-7"
 								data={modalTiles}
 								keyExtractor={(x) => x.id}
 								numColumns={2}
-								columnWrapperStyle={{ gap: 14 }}
+								columnWrapperClassName="gap-3.5"
 								renderItem={({ item }) => {
 									if (item.kind === 'add') {
 										return (
 											<TouchableOpacity
 												activeOpacity={0.8}
 												onPress={() => {}}
-												style={styles.modalAddTile}
+												className="flex-1 h-[160px] rounded-[26px] bg-[#2E2E2E] items-center justify-center"
 												accessibilityRole="button"
 												accessibilityLabel="Add resource to collection (not implemented)"
 											>
 												<Text
-													style={styles.modalAddPlus}
+													className="text-[#F9FAFB] text-[72px] font-extralight -mt-1.5"
 												>
 													+
 												</Text>
@@ -479,7 +465,7 @@ export default function SavedScreen() {
 									return (
 										<TouchableOpacity
 											activeOpacity={0.8}
-											style={styles.modalTile}
+											className="flex-1 h-[160px] rounded-[26px] bg-[#2E2E2E] justify-end p-3.5"
 											onPress={() =>
 												router.push({
 													pathname: '/resource/[id]',
@@ -494,7 +480,7 @@ export default function SavedScreen() {
 											}
 										>
 											<Text
-												style={styles.modalTileLabel}
+												className="text-[#F9FAFB] text-[26px] font-extrabold"
 												numberOfLines={2}
 											>
 												{resource.title}
@@ -505,7 +491,7 @@ export default function SavedScreen() {
 								ListEmptyComponent={
 									openCollection?.id === 'recent' ? (
 										<Text
-											style={styles.emptyCollectionText}
+											className="text-[#9CA3AF] text-base mt-2"
 										>
 											No saved resources yet.
 										</Text>
@@ -520,236 +506,3 @@ export default function SavedScreen() {
 		</SafeAreaView>
 	);
 }
-
-const styles = StyleSheet.create({
-	safe: {
-		flex: 1,
-		backgroundColor: BG,
-	},
-	container: {
-		flex: 1,
-		backgroundColor: BG,
-		paddingHorizontal: 20,
-	},
-	scrollContent: {
-		paddingBottom: 24,
-	},
-	headerRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		marginBottom: 6,
-		marginTop: 2,
-	},
-	headerTitle: {
-		color: TEXT,
-		fontSize: 32,
-		fontWeight: '800',
-		letterSpacing: 0.2,
-		lineHeight: 38,
-	},
-	sectionTitle: {
-		color: TEXT,
-		fontSize: 30,
-		fontWeight: '800',
-		marginTop: 0,
-		marginBottom: 12,
-		lineHeight: 36,
-	},
-
-	gridWrap: {
-		paddingBottom: 12,
-	},
-	columnWrap: {
-		flexDirection: 'row',
-		gap: 18,
-		marginBottom: 18,
-	},
-	rowSpacer: {
-		flex: 1,
-	},
-
-	collectionTile: {
-		flex: 1,
-	},
-	collectionSquare: {
-		width: '100%',
-		height: 165,
-		borderRadius: 28,
-		backgroundColor: '#1A1F4A',
-		marginBottom: 10,
-	},
-	collectionName: {
-		color: TEXT,
-		fontSize: 22,
-		fontWeight: '700',
-	},
-	addTileWrap: {
-		flex: 1,
-		alignItems: 'flex-start',
-	},
-	addTile: {
-		width: 165,
-		height: 165,
-		borderRadius: 999,
-		backgroundColor: '#2E2E2E',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	addPlus: {
-		color: TEXT,
-		fontSize: 72,
-		fontWeight: '200',
-		marginTop: -6,
-	},
-
-	modalSafe: {
-		flex: 1,
-		backgroundColor: BG,
-	},
-	modalContainer: {
-		flex: 1,
-		backgroundColor: BG,
-	},
-	modalHeader: {
-		paddingHorizontal: 20,
-		paddingTop: 4,
-		paddingBottom: 10,
-		flexDirection: 'row',
-		alignItems: 'flex-start',
-		justifyContent: 'space-between',
-	},
-	modalTitleRow: {
-		flex: 1,
-		paddingRight: 10,
-	},
-	modalTitleTap: {
-		paddingVertical: 4,
-	},
-	modalTitle: {
-		color: TEXT,
-		fontSize: 30,
-		fontWeight: '800',
-		lineHeight: 36,
-	},
-	modalTitleEditWrap: {
-		paddingTop: 2,
-	},
-	modalTitleInput: {
-		color: TEXT,
-		fontSize: 28,
-		fontWeight: '800',
-		lineHeight: 34,
-		paddingVertical: 4,
-		paddingHorizontal: 0,
-	},
-	editHelpText: {
-		color: MUTED,
-		fontSize: 12,
-		marginTop: 4,
-	},
-	modalHeaderBtns: {
-		flexDirection: 'row',
-		gap: 10,
-		alignItems: 'center',
-	},
-	iconBtn: {
-		padding: 8,
-		borderRadius: 999,
-	},
-	editActionsRow: {
-		paddingHorizontal: 20,
-		flexDirection: 'row',
-		gap: 10,
-		marginTop: 4,
-		marginBottom: 6,
-	},
-	editBtn: {
-		flex: 1,
-		height: 40,
-		borderRadius: 999,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	editBtnGhost: {
-		borderWidth: 1,
-		borderColor: TEXT,
-		backgroundColor: 'transparent',
-	},
-	editBtnSolid: {
-		backgroundColor: TEXT,
-	},
-	editBtnText: {
-		color: TEXT,
-		fontSize: 13,
-		fontWeight: '800',
-	},
-	modalSearchRow: {
-		paddingHorizontal: 20,
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: 12,
-		marginTop: 10,
-	},
-	modalSearchBar: {
-		flex: 1,
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: INPUT,
-		borderRadius: 14,
-		paddingHorizontal: 14,
-		height: 44,
-	},
-	modalSearchInput: {
-		flex: 1,
-		color: TEXT,
-		fontSize: 16,
-		paddingVertical: 0,
-	},
-	modalFilterBtn: {
-		width: 52,
-		height: 44,
-		borderRadius: 14,
-		backgroundColor: INPUT,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	modalGrid: {
-		paddingHorizontal: 20,
-		paddingTop: 22,
-		paddingBottom: 28,
-		gap: 14,
-	},
-	modalAddTile: {
-		flex: 1,
-		height: 160,
-		borderRadius: 26,
-		backgroundColor: '#2E2E2E',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	modalAddPlus: {
-		color: TEXT,
-		fontSize: 72,
-		fontWeight: '200',
-		marginTop: -6,
-	},
-	modalTile: {
-		flex: 1,
-		height: 160,
-		borderRadius: 26,
-		backgroundColor: '#2E2E2E',
-		justifyContent: 'flex-end',
-		padding: 14,
-	},
-	modalTileLabel: {
-		color: TEXT,
-		fontSize: 26,
-		fontWeight: '800',
-	},
-	emptyCollectionText: {
-		color: MUTED,
-		fontSize: 16,
-		marginTop: 8,
-	},
-});

@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAudioPlayer } from 'expo-audio';
 import { Image } from 'expo-image';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 import { Resource } from '@/types/resource';
 import {
@@ -24,7 +24,7 @@ function AudioButton({ url }: { url: string }) {
 
 	return (
 		<TouchableOpacity
-			style={styles.audioButton}
+			className="mt-2.5 flex-row items-center self-start bg-white/14 px-2.5 py-2 rounded-full gap-1.5"
 			onPress={() => {
 				if (player.playing) {
 					player.pause();
@@ -38,7 +38,7 @@ function AudioButton({ url }: { url: string }) {
 				size={18}
 				color="#fff"
 			/>
-			<Text style={styles.audioButtonText}>
+			<Text className="text-white text-[12px] font-bold">
 				{player.playing ? 'Pause' : 'Play'}
 			</Text>
 		</TouchableOpacity>
@@ -75,19 +75,19 @@ export function ResourceCard({ item, onOpenText, onOpenPdf }: Props) {
 
 	return (
 		<TouchableOpacity
-			style={styles.card}
+			className="bg-[#17133A] rounded-[18px] p-3 mb-3.5 w-[48%] min-h-[180px] justify-end overflow-hidden"
 			activeOpacity={0.75}
 			onPress={kind === 'AUDIO' ? undefined : handlePress}
 		>
 			{previewUrl ? (
 				<Image
 					source={previewUrl}
-					style={styles.preview}
+					className="absolute top-0 left-0 right-0 h-24"
 					contentFit="cover"
 				/>
 			) : null}
 
-			<View style={styles.iconBadge}>
+			<View className="absolute top-2.5 right-2.5 w-[30px] h-[30px] rounded-[10px] bg-black/35 items-center justify-center">
 				{kind === 'TEXT' && (
 					<Ionicons name="document-text" size={16} color="#fff" />
 				)}
@@ -109,94 +109,22 @@ export function ResourceCard({ item, onOpenText, onOpenPdf }: Props) {
 			</View>
 
 			{item.evergreen && (
-				<View style={styles.evergreenBadge}>
+				<View className="absolute top-2.5 left-2.5 w-6 h-6 rounded-lg bg-black/35 items-center justify-center">
 					<Ionicons name="leaf" size={12} color="#4ADE80" />
 				</View>
 			)}
 
-			<Text style={styles.cardTitle} numberOfLines={2}>
+			<Text className="text-white text-base font-black leading-5" numberOfLines={2}>
 				{item.title}
 			</Text>
 
 			{kind === 'AUDIO' && item.url ? (
 				<AudioButton url={item.url} />
 			) : (
-				<Text style={styles.cardMeta} numberOfLines={1}>
+				<Text className="mt-1.5 text-white/75 text-[12px] font-bold" numberOfLines={1}>
 					{kind}
 				</Text>
 			)}
 		</TouchableOpacity>
 	);
 }
-
-const CARD = '#17133A';
-
-const styles = StyleSheet.create({
-	card: {
-		backgroundColor: CARD,
-		borderRadius: 18,
-		padding: 12,
-		marginBottom: 14,
-		width: '48%',
-		minHeight: 180,
-		justifyContent: 'flex-end',
-		overflow: 'hidden',
-	},
-	preview: {
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		right: 0,
-		height: 96,
-	},
-	iconBadge: {
-		position: 'absolute',
-		top: 10,
-		right: 10,
-		width: 30,
-		height: 30,
-		borderRadius: 10,
-		backgroundColor: 'rgba(0,0,0,0.35)',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	evergreenBadge: {
-		position: 'absolute',
-		top: 10,
-		left: 10,
-		width: 24,
-		height: 24,
-		borderRadius: 8,
-		backgroundColor: 'rgba(0,0,0,0.35)',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	cardTitle: {
-		color: '#FFFFFF',
-		fontSize: 16,
-		fontWeight: '900',
-		lineHeight: 20,
-	},
-	cardMeta: {
-		marginTop: 6,
-		color: 'rgba(255,255,255,0.75)',
-		fontSize: 12,
-		fontWeight: '700',
-	},
-	audioButton: {
-		marginTop: 10,
-		flexDirection: 'row',
-		alignItems: 'center',
-		alignSelf: 'flex-start',
-		backgroundColor: 'rgba(255,255,255,0.14)',
-		paddingHorizontal: 10,
-		paddingVertical: 8,
-		borderRadius: 999,
-		gap: 6,
-	},
-	audioButtonText: {
-		color: '#fff',
-		fontSize: 12,
-		fontWeight: '700',
-	},
-});

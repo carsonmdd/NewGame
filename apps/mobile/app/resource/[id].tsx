@@ -1,12 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import {
 	Linking,
 	Pressable,
 	ScrollView,
-	StyleSheet,
 	Text,
 	View,
 } from 'react-native';
@@ -14,6 +12,10 @@ import {
 import { useSavedResources } from '@/contexts/SavedResourcesContext';
 import { Resource } from '@/types/resource';
 import { getDisplayKind, isYouTubeUrl } from '@/utils/resourceRender';
+
+const COLORS = {
+	textPrimary: '#F4F1FF',
+};
 
 function formatDate(dateString?: string) {
 	if (!dateString) return 'Unknown date';
@@ -53,9 +55,9 @@ export default function ResourceDetailScreen() {
 		return (
 			<>
 				<Stack.Screen options={{ headerShown: false }} />
-				<View style={styles.container}>
-					<View style={styles.centered}>
-						<Text style={styles.notFoundText}>
+				<View className="flex-1 bg-[#0E0F14]">
+					<View className="flex-1 items-center justify-center px-6">
+						<Text className="text-[#F4F1FF] text-lg font-bold">
 							Resource not found.
 						</Text>
 					</View>
@@ -96,9 +98,9 @@ export default function ResourceDetailScreen() {
 	const renderSection = (label: string, content?: string) => {
 		if (!content) return null;
 		return (
-			<View style={styles.section}>
-				<Text style={styles.sectionLabel}>{label}</Text>
-				<Text style={styles.sectionText}>{content}</Text>
+			<View className="mb-6">
+				<Text className="text-[#F4F1FF]/72 text-[12px] font-extrabold uppercase tracking-widest mb-2">{label}</Text>
+				<Text className="text-[#F4F1FF] text-base leading-6 font-medium">{content}</Text>
 			</View>
 		);
 	};
@@ -106,12 +108,12 @@ export default function ResourceDetailScreen() {
 	const renderChips = (label: string, items?: string[]) => {
 		if (!items || items.length === 0) return null;
 		return (
-			<View style={styles.section}>
-				<Text style={styles.sectionLabel}>{label}</Text>
-				<View style={styles.chipRow}>
+			<View className="mb-6">
+				<Text className="text-[#F4F1FF]/72 text-[12px] font-extrabold uppercase tracking-widest mb-2">{label}</Text>
+				<View className="flex-row flex-wrap gap-2">
 					{items.map((item, index) => (
-						<View key={index} style={styles.chip}>
-							<Text style={styles.chipText}>{item}</Text>
+						<View key={index} className="bg-[#2F2546] px-3 py-1.5 rounded-lg border border-white/6">
+							<Text className="text-[#F4F1FF] text-[12px] font-semibold">{item}</Text>
 						</View>
 					))}
 				</View>
@@ -121,14 +123,14 @@ export default function ResourceDetailScreen() {
 
 	const renderMainPanel = () => {
 		return (
-			<View style={styles.panel}>
+			<View className="bg-[#121319] rounded-2xl min-h-[520px] border border-white/6 overflow-hidden">
 				{(type === 'VIDEO' ||
 					type === 'AUDIO' ||
 					type === 'PDF' ||
 					type === 'LINK') && (
-					<View style={styles.mediaPanel}>
+					<View className="items-center justify-center px-5 pt-7 pb-6.5 bg-[#181922] border-b border-white/6">
 						{type === 'VIDEO' && (
-							<View style={styles.videoIconWrap}>
+							<View className="w-[84px] h-[84px] rounded-[42px] items-center justify-center bg-[#4D3B70]">
 								<Ionicons
 									name="play-circle-outline"
 									size={44}
@@ -137,7 +139,7 @@ export default function ResourceDetailScreen() {
 							</View>
 						)}
 						{type === 'AUDIO' && (
-							<View style={styles.audioIconWrap}>
+							<View className="w-[76px] h-[76px] rounded-[38px] items-center justify-center bg-[#4D3B70]">
 								<Ionicons
 									name="musical-notes-outline"
 									size={34}
@@ -146,7 +148,7 @@ export default function ResourceDetailScreen() {
 							</View>
 						)}
 						{type === 'PDF' && (
-							<View style={styles.pdfIconWrap}>
+							<View className="w-[76px] h-[76px] rounded-[20px] items-center justify-center bg-[#4D3B70]">
 								<Ionicons
 									name="document-text-outline"
 									size={38}
@@ -155,7 +157,7 @@ export default function ResourceDetailScreen() {
 							</View>
 						)}
 						{type === 'LINK' && (
-							<View style={styles.linkIconWrap}>
+							<View className="w-[76px] h-[76px] rounded-[20px] items-center justify-center bg-[#4D3B70]">
 								<Ionicons
 									name="open-outline"
 									size={34}
@@ -164,11 +166,11 @@ export default function ResourceDetailScreen() {
 							</View>
 						)}
 
-						<Text style={styles.mediaTitle}>{subjectLine}</Text>
+						<Text className="text-[#F4F1FF] text-xl font-extrabold mt-3.5 text-center">{subjectLine}</Text>
 
 						{externalUrl && (
 							<Pressable
-								style={styles.primaryActionButton}
+								className="flex-row items-center gap-2 bg-[#2F2546] rounded-full px-4 py-[11px] border border-white/6"
 								onPress={() => Linking.openURL(externalUrl)}
 							>
 								<Ionicons
@@ -176,7 +178,7 @@ export default function ResourceDetailScreen() {
 									size={18}
 									color={COLORS.textPrimary}
 								/>
-								<Text style={styles.primaryActionText}>
+								<Text className="text-[#F4F1FF] text-[14px] font-bold">
 									{type === 'VIDEO'
 										? getYouTubeEmbedLabel(externalUrl)
 										: type === 'PDF'
@@ -188,7 +190,7 @@ export default function ResourceDetailScreen() {
 					</View>
 				)}
 
-				<View style={styles.panelTextBlock}>
+				<View className="px-4 pt-4 pb-5.5">
 					{renderSection(
 						'Central Claim',
 						parsedResource.centralClaim,
@@ -224,8 +226,8 @@ export default function ResourceDetailScreen() {
 					{(parsedResource.syntheticQuery1 ||
 						parsedResource.syntheticQuery2 ||
 						parsedResource.syntheticQuery3) && (
-						<View style={styles.section}>
-							<Text style={styles.sectionLabel}>
+						<View className="mb-6">
+							<Text className="text-[#F4F1FF]/72 text-[12px] font-extrabold uppercase tracking-widest mb-2">
 								Synthetic Queries
 							</Text>
 							{renderSection('', parsedResource.syntheticQuery1)}
@@ -247,10 +249,10 @@ export default function ResourceDetailScreen() {
 		<>
 			<Stack.Screen options={{ headerShown: false }} />
 
-			<View style={styles.container}>
-				<View style={styles.header}>
+			<View className="flex-1 bg-[#0E0F14]">
+				<View className="h-[98px] pt-4.5 px-3.5 bg-[#2B2140] border-b border-white/6 flex-row items-center">
 					<Pressable
-						style={styles.headerIconButton}
+						className="w-11 h-11 rounded-xl items-center justify-center"
 						onPress={() => router.back()}
 					>
 						<Ionicons
@@ -260,17 +262,17 @@ export default function ResourceDetailScreen() {
 						/>
 					</Pressable>
 
-					<View style={styles.headerCenter}>
-						<Text style={styles.headerTitle} numberOfLines={1}>
+					<View className="flex-1 items-center justify-center px-2">
+						<Text className="text-[#F4F1FF] text-lg font-extrabold text-center" numberOfLines={1}>
 							{parsedResource.title}
 						</Text>
-						<Text style={styles.headerSubtitle} numberOfLines={1}>
+						<Text className="text-[#F4F1FF]/72 text-[12px] font-semibold text-center mt-0.5" numberOfLines={1}>
 							{subjectLine}
 						</Text>
 					</View>
 
 					<Pressable
-						style={styles.headerIconButton}
+						className="w-11 h-11 rounded-xl items-center justify-center"
 						onPress={() => {
 							if (saved) {
 								unsaveResource(resourceId);
@@ -288,32 +290,32 @@ export default function ResourceDetailScreen() {
 				</View>
 
 				<ScrollView
-					style={styles.body}
-					contentContainerStyle={styles.scrollContent}
+					className="flex-1"
+					contentContainerClassName="px-3.5 pt-3.5 pb-7"
 					showsVerticalScrollIndicator={false}
 				>
-					<View style={styles.metaRow}>
-						<Text style={styles.metaText}>{author}</Text>
+					<View className="flex-row items-center mb-3 px-1 flex-wrap">
+						<Text className="text-[#F4F1FF]/72 text-[13px] font-medium">{author}</Text>
 						{!!source && (
 							<>
-								<Text style={styles.metaDot}>•</Text>
-								<Text style={styles.metaText}>{source}</Text>
+								<Text className="text-[#F4F1FF]/72 mx-2 text-[13px]">•</Text>
+								<Text className="text-[#F4F1FF]/72 text-[13px] font-medium">{source}</Text>
 							</>
 						)}
-						<Text style={styles.metaDot}>•</Text>
-						<Text style={styles.metaText}>
+						<Text className="text-[#F4F1FF]/72 mx-2 text-[13px]">•</Text>
+						<Text className="text-[#F4F1FF]/72 text-[13px] font-medium">
 							{formatDate(dateStr)}
 						</Text>
 						{parsedResource.evergreen && (
 							<>
-								<Text style={styles.metaDot}>•</Text>
-								<View style={styles.evergreenBadge}>
+								<Text className="text-[#F4F1FF]/72 mx-2 text-[13px]">•</Text>
+								<View className="flex-row items-center bg-[#4ADE80]/10 px-2 py-1 rounded-md gap-1">
 									<Ionicons
 										name="leaf-outline"
 										size={12}
 										color="#4ADE80"
 									/>
-									<Text style={styles.evergreenText}>
+									<Text className="text-[#4ADE80] text-[11px] font-bold">
 										Evergreen
 									</Text>
 								</View>
@@ -327,282 +329,3 @@ export default function ResourceDetailScreen() {
 		</>
 	);
 }
-
-const COLORS = {
-	screenBg: '#0E0F14',
-	headerBg: '#2B2140',
-	panelBg: '#121319',
-	panelInner: '#181922',
-	textPrimary: '#F4F1FF',
-	textSecondary: 'rgba(244,241,255,0.72)',
-	border: 'rgba(255,255,255,0.06)',
-	accent: '#4D3B70',
-	buttonBg: '#2F2546',
-	buttonBgPressed: '#3B2E58',
-	mediaSurface: '#1A1B24',
-};
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: COLORS.screenBg,
-	},
-
-	centered: {
-		flex: 1,
-		alignItems: 'center',
-		justifyContent: 'center',
-		paddingHorizontal: 24,
-	},
-
-	notFoundText: {
-		color: COLORS.textPrimary,
-		fontSize: 18,
-		fontWeight: '700',
-	},
-
-	header: {
-		height: 98,
-		paddingTop: 18,
-		paddingHorizontal: 14,
-		backgroundColor: COLORS.headerBg,
-		borderBottomWidth: 1,
-		borderBottomColor: COLORS.border,
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-
-	headerIconButton: {
-		width: 44,
-		height: 44,
-		borderRadius: 12,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-
-	headerCenter: {
-		flex: 1,
-		alignItems: 'center',
-		justifyContent: 'center',
-		paddingHorizontal: 8,
-	},
-
-	headerTitle: {
-		color: COLORS.textPrimary,
-		fontSize: 18,
-		fontWeight: '800',
-		textAlign: 'center',
-	},
-
-	headerSubtitle: {
-		color: COLORS.textSecondary,
-		fontSize: 12,
-		fontWeight: '600',
-		textAlign: 'center',
-		marginTop: 2,
-	},
-
-	body: {
-		flex: 1,
-	},
-
-	scrollContent: {
-		paddingHorizontal: 14,
-		paddingTop: 14,
-		paddingBottom: 28,
-	},
-
-	metaRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: 12,
-		paddingHorizontal: 4,
-		flexWrap: 'wrap',
-	},
-
-	metaText: {
-		color: COLORS.textSecondary,
-		fontSize: 13,
-		fontWeight: '500',
-	},
-
-	metaDot: {
-		color: COLORS.textSecondary,
-		marginHorizontal: 8,
-		fontSize: 13,
-	},
-
-	panel: {
-		backgroundColor: COLORS.panelBg,
-		borderRadius: 16,
-		minHeight: 520,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-		overflow: 'hidden',
-	},
-
-	panelLabel: {
-		color: COLORS.textPrimary,
-		fontSize: 15,
-		fontWeight: '800',
-		marginBottom: 12,
-	},
-
-	panelText: {
-		color: COLORS.textPrimary,
-		fontSize: 16,
-		lineHeight: 30,
-		fontWeight: '700',
-	},
-
-	panelTextBlock: {
-		paddingHorizontal: 16,
-		paddingTop: 16,
-		paddingBottom: 22,
-	},
-
-	fullImage: {
-		width: '100%',
-		height: 320,
-		backgroundColor: COLORS.mediaSurface,
-	},
-
-	mediaPanel: {
-		alignItems: 'center',
-		justifyContent: 'center',
-		paddingHorizontal: 20,
-		paddingTop: 28,
-		paddingBottom: 26,
-		backgroundColor: COLORS.panelInner,
-		borderBottomWidth: 1,
-		borderBottomColor: COLORS.border,
-	},
-
-	mediaTitle: {
-		color: COLORS.textPrimary,
-		fontSize: 20,
-		fontWeight: '800',
-		marginTop: 14,
-		textAlign: 'center',
-	},
-
-	mediaSubtext: {
-		color: COLORS.textSecondary,
-		fontSize: 14,
-		lineHeight: 21,
-		textAlign: 'center',
-		marginTop: 8,
-		marginBottom: 16,
-	},
-
-	audioIconWrap: {
-		width: 76,
-		height: 76,
-		borderRadius: 38,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: COLORS.accent,
-	},
-
-	videoIconWrap: {
-		width: 84,
-		height: 84,
-		borderRadius: 42,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: COLORS.accent,
-	},
-
-	pdfIconWrap: {
-		width: 76,
-		height: 76,
-		borderRadius: 20,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: COLORS.accent,
-	},
-
-	linkIconWrap: {
-		width: 76,
-		height: 76,
-		borderRadius: 20,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: COLORS.accent,
-	},
-
-	primaryActionButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: 8,
-		backgroundColor: COLORS.buttonBg,
-		borderRadius: 999,
-		paddingHorizontal: 16,
-		paddingVertical: 11,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-
-	primaryActionText: {
-		color: COLORS.textPrimary,
-		fontSize: 14,
-		fontWeight: '700',
-	},
-
-	section: {
-		marginBottom: 24,
-	},
-
-	sectionLabel: {
-		color: COLORS.textSecondary,
-		fontSize: 12,
-		fontWeight: '800',
-		textTransform: 'uppercase',
-		letterSpacing: 1,
-		marginBottom: 8,
-	},
-
-	sectionText: {
-		color: COLORS.textPrimary,
-		fontSize: 16,
-		lineHeight: 24,
-		fontWeight: '500',
-	},
-
-	chipRow: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		gap: 8,
-	},
-
-	chip: {
-		backgroundColor: COLORS.buttonBg,
-		paddingHorizontal: 12,
-		paddingVertical: 6,
-		borderRadius: 8,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-
-	chipText: {
-		color: COLORS.textPrimary,
-		fontSize: 12,
-		fontWeight: '600',
-	},
-
-	evergreenBadge: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: 'rgba(74, 222, 128, 0.1)',
-		paddingHorizontal: 8,
-		paddingVertical: 4,
-		borderRadius: 6,
-		gap: 4,
-	},
-
-	evergreenText: {
-		color: '#4ADE80',
-		fontSize: 11,
-		fontWeight: '700',
-	},
-});

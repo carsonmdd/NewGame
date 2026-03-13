@@ -1,6 +1,5 @@
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import { AlgoliaSearchBox } from '@/components/AlgoliaSearchBox';
 import { AlgoliaHits } from '@/components/AlgoliaHits';
@@ -15,17 +14,17 @@ export default function SearchScreen() {
 	const insets = useSafeAreaInsets();
 
 	return (
-		<SafeAreaView style={styles.safe} edges={['left', 'right']}>
-			<View style={[styles.container, { paddingTop: insets.top }]}>
+		<SafeAreaView className="flex-1 bg-[#0B0B0F]" edges={['left', 'right']}>
+			<View className="flex-1 bg-[#0B0B0F]" style={{ paddingTop: insets.top }}>
 				{/* Keep Filters Updated */}
 				<AlgoliaFilterWidgets />
 
 				<ScrollView
-					contentContainerStyle={styles.scrollContent}
+					contentContainerClassName="px-4 pt-2.5 pb-8"
 					showsVerticalScrollIndicator={false}
 				>
-					<View style={styles.topBar}>
-						<Text style={styles.screenLabel}>Search</Text>
+					<View className="flex-row justify-between items-center mb-3">
+						<Text className="text-white text-[34px] font-black">Search</Text>
 					</View>
 
 					{/* Search bar with Algolia */}
@@ -38,75 +37,3 @@ export default function SearchScreen() {
 		</SafeAreaView>
 	);
 }
-
-const BG = '#0B0B0F';
-const CARD = '#17133A';
-
-const styles = StyleSheet.create({
-	safe: {
-		flex: 1,
-		backgroundColor: BG,
-	},
-	container: {
-		flex: 1,
-		backgroundColor: BG,
-	},
-	scrollContent: {
-		paddingHorizontal: 16,
-		paddingTop: 10,
-		paddingBottom: 32,
-	},
-
-	// Top bar
-	topBar: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginBottom: 12,
-	},
-	screenLabel: {
-		color: '#FFFFFF',
-		fontSize: 34,
-		fontWeight: '900',
-	},
-
-	// Sections
-	sectionLabel: {
-		color: 'rgba(255,255,255,0.75)',
-		fontSize: 13,
-		fontWeight: '800',
-		marginBottom: 10,
-		textTransform: 'uppercase',
-		letterSpacing: 0.6,
-	},
-	sectionSpacing: {
-		marginTop: 18,
-	},
-	subtleText: {
-		color: 'rgba(255,255,255,0.65)',
-		fontSize: 13,
-		marginBottom: 8,
-	},
-
-	// Grid of cards
-	grid: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'space-between',
-	},
-	card: {
-		backgroundColor: CARD,
-		borderRadius: 18,
-		padding: 12,
-		marginBottom: 14,
-		width: '48%',
-		minHeight: 160,
-		justifyContent: 'flex-end',
-	},
-	cardTitle: {
-		color: '#FFFFFF',
-		fontSize: 16,
-		fontWeight: '900',
-		lineHeight: 20,
-	},
-});

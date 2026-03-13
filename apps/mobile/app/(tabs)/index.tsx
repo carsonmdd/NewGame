@@ -3,7 +3,6 @@ import { Resource } from '@/types/resource';
 import React, { useEffect, useState } from 'react';
 import {
 	ScrollView,
-	StyleSheet,
 	Text,
 	TouchableOpacity,
 	View,
@@ -34,30 +33,30 @@ export default function HomeScreen() {
 	}, []);
 
 	return (
-		<View style={styles.container}>
+		<View className="flex-1 bg-[#0A0A0A]">
 			<ScrollView
 				showsVerticalScrollIndicator={false}
-				contentContainerStyle={styles.scrollContent}
+				contentContainerClassName="px-5 pt-[18px] pb-8"
 			>
-				<View style={styles.headerRow}>
-					<Text style={styles.homeTitle}>Home</Text>
+				<View className="flex-row justify-between items-center mb-5">
+					<Text className="text-white text-2xl font-bold">Home</Text>
 				</View>
 
-				<View style={styles.section}>
-					<View style={styles.sectionHeader}>
-						<Text style={styles.sectionTitle}>Trending</Text>
+				<View className="mb-6">
+					<View className="flex-row justify-between items-center mb-3">
+						<Text className="text-white text-lg font-bold">Trending</Text>
 					</View>
 
 					{trending.map((item) => (
 						<TouchableOpacity
 							key={item.id}
 							activeOpacity={0.85}
-							style={styles.resourceCard}
+							className="h-[185px] rounded-[20px] bg-[#161616] mb-4 overflow-hidden relative"
 						>
-							<View style={styles.imagePlaceholder} />
-							<View style={styles.cardOverlay}>
+							<View className="absolute inset-0 bg-[#2B2B2B]" />
+							<View className="flex-1 justify-end px-[18px] pb-[18px]">
 								<Text
-									style={styles.cardTitle}
+									className="text-white text-[17px] font-bold leading-[22px]"
 									numberOfLines={2}
 								>
 									{item.title}
@@ -67,21 +66,21 @@ export default function HomeScreen() {
 					))}
 				</View>
 
-				<View style={styles.section}>
-					<View style={styles.sectionHeader}>
-						<Text style={styles.sectionTitle}>Latest</Text>
+				<View className="mb-6">
+					<View className="flex-row justify-between items-center mb-3">
+						<Text className="text-white text-lg font-bold">Latest</Text>
 					</View>
 
 					{latest.map((item) => (
 						<TouchableOpacity
 							key={item.id}
 							activeOpacity={0.85}
-							style={styles.resourceCard}
+							className="h-[185px] rounded-[20px] bg-[#161616] mb-4 overflow-hidden relative"
 						>
-							<View style={styles.imagePlaceholder} />
-							<View style={styles.cardOverlay}>
+							<View className="absolute inset-0 bg-[#2B2B2B]" />
+							<View className="flex-1 justify-end px-[18px] pb-[18px]">
 								<Text
-									style={styles.cardTitle}
+									className="text-white text-[17px] font-bold leading-[22px]"
 									numberOfLines={2}
 								>
 									{item.title}
@@ -94,69 +93,3 @@ export default function HomeScreen() {
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#0A0A0A',
-	},
-	scrollContent: {
-		paddingHorizontal: 20,
-		paddingTop: 18,
-		paddingBottom: 32,
-	},
-	headerRow: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginBottom: 20,
-	},
-	homeTitle: {
-		color: '#FFFFFF',
-		fontSize: 24,
-		fontWeight: '700',
-	},
-	section: {
-		marginBottom: 24,
-	},
-	sectionHeader: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginBottom: 12,
-	},
-	sectionTitle: {
-		color: '#FFFFFF',
-		fontSize: 18,
-		fontWeight: '700',
-	},
-	sectionLink: {
-		color: '#BDBDBD',
-		fontSize: 13,
-		fontWeight: '500',
-	},
-	resourceCard: {
-		height: 185,
-		borderRadius: 20,
-		backgroundColor: '#161616',
-		marginBottom: 16,
-		overflow: 'hidden',
-		position: 'relative',
-	},
-	imagePlaceholder: {
-		...StyleSheet.absoluteFillObject,
-		backgroundColor: '#2B2B2B',
-	},
-	cardOverlay: {
-		flex: 1,
-		justifyContent: 'flex-end',
-		paddingHorizontal: 18,
-		paddingBottom: 18,
-	},
-	cardTitle: {
-		color: '#FFFFFF',
-		fontSize: 17,
-		fontWeight: '700',
-		lineHeight: 22,
-	},
-});

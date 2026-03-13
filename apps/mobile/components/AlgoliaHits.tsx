@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { useHits, UseHitsProps } from 'react-instantsearch-core';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { ResourceCard } from '@/components/ResourceCard';
 import { Resource } from '@/types/resource';
@@ -31,11 +31,11 @@ export function AlgoliaHits(props: UseHitsProps<Resource>) {
 	}, [hits]);
 
 	if (visibleHits.length === 0) {
-		return <Text style={styles.subtleText}>No resources found.</Text>;
+		return <Text className="text-white/65 text-[13px] mb-2">No resources found.</Text>;
 	}
 
 	return (
-		<View style={styles.grid}>
+		<View className="flex-row flex-wrap justify-between">
 			{visibleHits.map((item) => (
 				<ResourceCard
 					key={getStableId(item)}
@@ -72,16 +72,3 @@ export function AlgoliaHits(props: UseHitsProps<Resource>) {
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	subtleText: {
-		color: 'rgba(255,255,255,0.65)',
-		fontSize: 13,
-		marginBottom: 8,
-	},
-	grid: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'space-between',
-	},
-});

@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useState } from 'react';
 import {
 	ScrollView,
-	StyleSheet,
 	Text,
 	TouchableOpacity,
 	View,
@@ -16,9 +15,6 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { getSearchSortMode, setSearchSortMode } from '@/lib/searchSort';
 
-const BG = '#050509';
-const CARD = '#0F0F14';
-const BORDER = '#2B2B36';
 const TEXT = '#F9FAFB';
 const MUTED = '#9CA3AF';
 
@@ -65,24 +61,24 @@ export default function FilterScreen() {
 	const seeResults = () => navigation.goBack();
 
 	return (
-		<View style={styles.container}>
+		<View className="flex-1 bg-[#050509]">
 			{/* Header */}
-			<View style={styles.header}>
-				<Text style={styles.headerTitle}>Filters</Text>
+			<View className="px-4 pb-2.5 flex-row items-center justify-between border-b border-[#2B2B36]">
+				<Text className="text-[#F9FAFB] text-[28px] leading-[34px] font-extrabold">Filters</Text>
 				{totalRefinements > 0 ? (
-					<View style={styles.badge}>
-						<Text style={styles.badgeText}>{totalRefinements}</Text>
+					<View className="min-w-[24px] h-6 px-2 rounded-full bg-[#252b33] items-center justify-center">
+						<Text className="text-white font-extrabold text-[12px]">{totalRefinements}</Text>
 					</View>
 				) : null}
 			</View>
 
 			<ScrollView
-				contentContainerStyle={styles.content}
+				contentContainerClassName="px-4 pt-4 pb-7"
 				showsVerticalScrollIndicator={false}
 			>
 				{/* Sort by */}
-				<Text style={styles.sectionTitle}>Sort by</Text>
-				<View style={styles.sectionBox}>
+				<Text className="text-[#F9FAFB] text-[17px] leading-[22px] font-bold mb-2.5">Sort by</Text>
+				<View className="bg-[#0F0F14] rounded-2xl border border-[#2B2B36] px-3 py-2.5">
 					{SORT_ITEMS.map((o) => (
 						<Row
 							key={o.value}
@@ -98,15 +94,15 @@ export default function FilterScreen() {
 				</View>
 
 				{/* Filter by */}
-				<Text style={[styles.sectionTitle, { marginTop: 18 }]}>
+				<Text className="text-[#F9FAFB] text-[17px] leading-[22px] font-bold mb-2.5 mt-4.5">
 					Filter by
 				</Text>
 
 				{/* Keywords */}
-				<Text style={styles.subSectionTitle}>Keywords</Text>
-				<View style={styles.sectionBox}>
+				<Text className="text-[#E5E7EB] text-[15px] leading-[20px] font-bold mb-2">Keywords</Text>
+				<View className="bg-[#0F0F14] rounded-2xl border border-[#2B2B36] px-3 py-2.5">
 					{keywords.items.length === 0 ? (
-						<Text style={styles.emptyText}>No keywords found.</Text>
+						<Text className="text-white/55 text-[13px] leading-[18px] py-1.5">No keywords found.</Text>
 					) : (
 						keywords.items.map((item) => (
 							<Row
@@ -126,26 +122,22 @@ export default function FilterScreen() {
 				</View>
 
 				{/* Bottom buttons */}
-				<View style={styles.footerBtns}>
+				<View className="flex-row gap-2.5 mt-[22px]">
 					<TouchableOpacity
 						activeOpacity={0.8}
-						style={[
-							styles.btn,
-							styles.btnOutline,
-							!canClearAnything && styles.btnDisabled,
-						]}
+						className={`flex-1 h-11 rounded-full items-center justify-center border border-[#F9FAFB] bg-transparent ${!canClearAnything ? 'opacity-35' : ''}`}
 						onPress={clearAll}
 						disabled={!canClearAnything}
 					>
-						<Text style={styles.btnText}>Clear all</Text>
+						<Text className="text-[#F9FAFB] text-[15px] leading-[20px] font-bold">Clear all</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity
 						activeOpacity={0.8}
-						style={styles.btnSolidWrap}
+						className="flex-1 h-11 rounded-full items-center justify-center bg-[#F9FAFB]"
 						onPress={seeResults}
 					>
-						<Text style={[styles.btnText, { color: '#0B0B10' }]}>
+						<Text className="text-[15px] leading-[20px] font-bold text-[#0B0B10]">
 							See results
 							{typeof nbHits === 'number' ? ` (${nbHits})` : ''}
 						</Text>
@@ -180,20 +172,20 @@ function Row({
 
 	return (
 		<TouchableOpacity
-			style={[styles.row, selected && styles.rowSelected]}
+			className={`min-h-[44px] flex-row items-center justify-between py-2.5 px-2 rounded-xl ${selected ? 'bg-white/8' : ''}`}
 			activeOpacity={0.7}
 			onPress={onPress}
 		>
 			<Text
-				style={[styles.rowLabel, selected && styles.rowLabelSelected]}
+				className={`text-[#E5E7EB] text-[17px] leading-[22px] ${selected ? 'font-bold text-[#F9FAFB]' : 'font-medium'}`}
 			>
 				{label}
 			</Text>
 
-			<View style={styles.rowRight}>
+			<View className="flex-row items-center gap-2 ml-2.5">
 				{rightText ? (
-					<View style={styles.countPill}>
-						<Text style={styles.countPillText}>{rightText}</Text>
+					<View className="bg-[#252b33] rounded-full px-2 py-0.5">
+						<Text className="text-white font-bold text-[12px]">{rightText}</Text>
 					</View>
 				) : null}
 
@@ -206,171 +198,3 @@ function Row({
 		</TouchableOpacity>
 	);
 }
-
-const styles = StyleSheet.create({
-	safe: {
-		flex: 1,
-		backgroundColor: BG,
-	},
-
-	container: {
-		flex: 1,
-		backgroundColor: BG,
-	},
-
-	header: {
-		paddingHorizontal: 16,
-		paddingBottom: 10,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		borderBottomWidth: StyleSheet.hairlineWidth,
-		borderBottomColor: BORDER,
-	},
-
-	headerTitle: {
-		color: TEXT,
-		fontSize: 28,
-		lineHeight: 34,
-		fontWeight: '800',
-	},
-
-	badge: {
-		minWidth: 24,
-		height: 24,
-		paddingHorizontal: 8,
-		borderRadius: 999,
-		backgroundColor: '#252b33',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	badgeText: {
-		color: '#fff',
-		fontWeight: '800',
-		fontSize: 12,
-	},
-
-	content: {
-		paddingHorizontal: 16,
-		paddingTop: 16,
-		paddingBottom: 28,
-	},
-
-	sectionTitle: {
-		color: TEXT,
-		fontSize: 17,
-		lineHeight: 22,
-		fontWeight: '700',
-		marginBottom: 10,
-	},
-
-	subSectionTitle: {
-		color: '#E5E7EB',
-		fontSize: 15,
-		lineHeight: 20,
-		fontWeight: '700',
-		marginBottom: 8,
-	},
-
-	sectionBox: {
-		backgroundColor: CARD,
-		borderRadius: 16,
-		borderWidth: 1,
-		borderColor: BORDER,
-		paddingHorizontal: 12,
-		paddingVertical: 10,
-	},
-
-	emptyText: {
-		color: 'rgba(255,255,255,0.55)',
-		fontSize: 13,
-		lineHeight: 18,
-		paddingVertical: 6,
-	},
-
-	row: {
-		minHeight: 44,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		paddingVertical: 10,
-		paddingHorizontal: 8,
-		borderRadius: 12,
-	},
-
-	rowSelected: {
-		backgroundColor: 'rgba(255,255,255,0.08)',
-	},
-
-	rowLabel: {
-		color: '#E5E7EB',
-		fontSize: 17,
-		lineHeight: 22,
-		fontWeight: '500',
-	},
-
-	rowLabelSelected: {
-		fontWeight: '700',
-		color: TEXT,
-	},
-
-	rowRight: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: 8,
-		marginLeft: 10,
-	},
-
-	countPill: {
-		backgroundColor: '#252b33',
-		borderRadius: 999,
-		paddingHorizontal: 8,
-		paddingVertical: 3,
-	},
-
-	countPillText: {
-		color: '#fff',
-		fontWeight: '700',
-		fontSize: 12,
-	},
-
-	footerBtns: {
-		flexDirection: 'row',
-		gap: 10,
-		marginTop: 22,
-	},
-
-	btn: {
-		flex: 1,
-		height: 44,
-		borderRadius: 999,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-
-	btnOutline: {
-		borderWidth: 1,
-		borderColor: TEXT,
-		backgroundColor: 'transparent',
-	},
-
-	btnDisabled: {
-		opacity: 0.35,
-	},
-
-	btnSolidWrap: {
-		flex: 1,
-		height: 44,
-		borderRadius: 999,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: TEXT,
-	},
-
-	btnText: {
-		color: TEXT,
-		fontSize: 15,
-		lineHeight: 20,
-		fontWeight: '700',
-	},
-});
