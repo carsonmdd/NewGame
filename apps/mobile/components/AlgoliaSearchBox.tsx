@@ -31,7 +31,9 @@ export function AlgoliaSearchBox(props: UseSearchBoxProps) {
 
 	return (
 		<View className="flex-row items-center bg-surface rounded-xl px-4 h-12 mb-6 border border-white/10">
-			<Search size={18} color="#8A8F98" className="mr-3" />
+			<View className="mr-3">
+				<Search size={18} color="#8A8F98" />
+			</View>
 			<TextInput
 				ref={inputRef}
 				className="flex-1 text-foreground text-base font-medium"

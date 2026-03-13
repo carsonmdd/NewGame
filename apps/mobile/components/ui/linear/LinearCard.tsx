@@ -38,7 +38,7 @@ export function LinearCard({
 				style={styles.highlight}
 			/>
 
-			<View className="p-5">{children}</View>
+			<View className="p-4">{children}</View>
 		</View>
 	);
 }

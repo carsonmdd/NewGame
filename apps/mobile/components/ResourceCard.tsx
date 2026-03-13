@@ -1,7 +1,7 @@
 import { ExternalLink } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View, StyleSheet } from 'react-native';
 
 import { Resource } from '@/types/resource';
 import { LinearCard } from './ui/linear/LinearCard';
@@ -29,32 +29,64 @@ export function ResourceCard({ item }: Props) {
 			activeOpacity={0.85}
 			onPress={handlePress}
 			className="w-[48%] mb-4"
+			style={styles.cardContainer}
 		>
 			<LinearCard
-				intensity={15}
-				containerClassName="min-h-[180px] justify-end p-4 border-white/5"
+				intensity={12}
+				containerClassName="min-h-[190px] justify-between border-white/5 bg-white/[0.02]"
 			>
-				<View className="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/5 items-center justify-center border border-white/10">
-					<ExternalLink size={14} color="rgba(255,255,255,0.6)" />
+				{/* Top Header - Icon is now consistently top-right */}
+				<View className="flex-row justify-between items-start">
+					<View className="flex-1 mr-8">
+						{item.sourceType && (
+							<View className="bg-accent/10 self-start px-2 py-0.5 rounded-md border border-accent/20">
+								<LinearText
+									variant="label"
+									className="text-[8px] text-accent-bright font-bold"
+									numberOfLines={1}
+								>
+									{item.sourceType}
+								</LinearText>
+							</View>
+						)}
+					</View>
+
+					<View className="absolute top-0 right-0 w-7 h-7 rounded-lg bg-white/5 items-center justify-center border border-white/10">
+						<ExternalLink size={12} color="rgba(255,255,255,0.4)" />
+					</View>
 				</View>
 
-				{item.sourceType && (
-					<LinearText
-						variant="label"
-						className="text-[9px] mb-2 text-accent/80"
-					>
-						{item.sourceType}
+				{/* Bottom Content - Focus on Title */}
+				<View className="mt-4">
+					<LinearText variant="h3" numberOfLines={3}>
+						{item.title}
 					</LinearText>
-				)}
 
-				<LinearText
-					variant="h3"
-					className="text-[15px] font-bold tracking-tight text-foreground leading-snug"
-					numberOfLines={2}
-				>
-					{item.title}
-				</LinearText>
+					{/* Decorative accent line */}
+					<View className="h-[2px] w-8 bg-accent/30 rounded-full mt-3" />
+
+					{item.author && (
+						<LinearText
+							variant="label"
+							className="text-[9px] mt-2 text-foreground-muted"
+							numberOfLines={1}
+						>
+							{item.author}
+						</LinearText>
+					)}
+				</View>
 			</LinearCard>
 		</TouchableOpacity>
 	);
 }
+
+const styles = StyleSheet.create({
+	cardContainer: {
+		// Ensure the card feels cohesive
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 8 },
+		shadowOpacity: 0.2,
+		shadowRadius: 12,
+		elevation: 5,
+	},
+});
