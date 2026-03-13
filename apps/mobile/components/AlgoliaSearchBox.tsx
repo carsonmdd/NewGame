@@ -36,7 +36,7 @@ export function AlgoliaSearchBox(props: UseSearchBoxProps) {
 			</View>
 			<TextInput
 				ref={inputRef}
-				className="flex-1 text-foreground text-base font-medium"
+				className="flex-1 text-foreground text-base font-medium outline-none"
 				placeholder="Search resources..."
 				placeholderTextColor="#8A8F98"
 				value={inputValue}

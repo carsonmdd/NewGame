@@ -47,7 +47,7 @@ export function ResourceCard({ item, onPress }: Props) {
 							<View className="bg-accent/10 self-start px-2 py-0.5 rounded-md border border-accent/20">
 								<CustomText
 									variant="label"
-									className="text-[8px] text-accent-bright font-bold"
+									className="text-[8px] text-accent-bright font-bold max-w-24"
 									numberOfLines={1}
 								>
 									{item.sourceType}
@@ -56,7 +56,7 @@ export function ResourceCard({ item, onPress }: Props) {
 						)}
 					</View>
 
-					<View className="absolute top-0 right-0 w-7 h-7 rounded-lg bg-white/5 items-center justify-center border border-white/10">
+					<View className="w-7 h-7 rounded-lg bg-white/5 items-center justify-center border border-white/10">
 						<ExternalLink size={12} color="rgba(255,255,255,0.4)" />
 					</View>
 				</View>

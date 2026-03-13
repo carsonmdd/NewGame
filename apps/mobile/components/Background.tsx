@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
@@ -86,11 +86,6 @@ const AmbientBlob = ({
 					right: initialRight,
 				},
 				animatedStyle,
-				{
-					// Simulate blur using a large scale or just rely on the subtle opacity
-					// In React Native, blur is hard on Android without a library,
-					// but we can use a gradient to soften the edges.
-				},
 			]}
 			pointerEvents="none"
 		>
@@ -105,8 +100,6 @@ const AmbientBlob = ({
 };
 
 export function Background({ children }: { children: React.ReactNode }) {
-	const { width, height } = useWindowDimensions();
-
 	return (
 		<View className="flex-1 bg-background-deep">
 			{/* Base Radial-like Gradient Layer */}
@@ -120,11 +113,9 @@ export function Background({ children }: { children: React.ReactNode }) {
 			<View
 				style={[StyleSheet.absoluteFill, { opacity: 0.05 }]}
 				pointerEvents="none"
-			>
-				{/* We can't easily do a grid without SVG or an image, so we'll focus on the blobs */}
-			</View>
+			></View>
 
-			{/* Animated Ambient Blobs - Based on Web Admin Dashboard */}
+			{/* Animated Ambient Blobs */}
 			<View style={StyleSheet.absoluteFill} pointerEvents="none">
 				{/* Top Leftish: accent-blue/10 */}
 				<AmbientBlob
