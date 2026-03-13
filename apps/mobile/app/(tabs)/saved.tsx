@@ -6,7 +6,6 @@ import {
 	Bookmark,
 	LayoutGrid,
 	ArrowUpRight,
-	User,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';

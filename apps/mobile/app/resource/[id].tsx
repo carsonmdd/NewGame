@@ -14,6 +14,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as WebBrowser from 'expo-web-browser';
 
 import { useSavedResources } from '@/contexts/SavedResourcesContext';
 import { Resource } from '@/types/resource';
@@ -204,7 +205,7 @@ export default function ResourceDetailScreen() {
 						<Button
 							title="View Original Source"
 							icon={<LinkIcon size={18} color="white" />}
-							onPress={() => {}}
+							onPress={() => WebBrowser.openBrowserAsync(resource.url!)}
 						/>
 					</View>
 				)}

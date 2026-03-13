@@ -1,4 +1,3 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
 	Text,
@@ -27,18 +26,25 @@ export function Button({
 				style={[styles.glow, props.style]}
 				{...props}
 			>
-				<LinearGradient
-					colors={['#5E6AD2', '#4F46E5']}
-					className="rounded-lg py-3.5 px-6 flex-row items-center justify-center border border-white/20"
-				>
-					{icon && <View className="mr-2.5">{icon}</View>}
-					<Text className="text-white font-bold text-base tracking-tight">
-						{title}
-					</Text>
-				</LinearGradient>
+				{/* Main Button Body with Accent Color */}
+				<View className="bg-accent rounded-lg overflow-hidden border border-white/20">
+					{/* Manual Gradient: Darker Overlay at the bottom */}
+					<View
+						className="absolute inset-0 bg-black/10"
+						style={{ top: '50%' }}
+					/>
 
-				{/* Inset Shadow Effect */}
-				<View style={styles.insetShadow} />
+					{/* Content Layer */}
+					<View className="py-3.5 px-6 flex-row items-center justify-center">
+						{icon && <View className="mr-2.5">{icon}</View>}
+						<Text className="text-white font-bold text-base tracking-tight">
+							{title}
+						</Text>
+					</View>
+
+					{/* Inset Shadow (Top Shine) */}
+					<View style={styles.insetShadow} pointerEvents="none" />
+				</View>
 			</TouchableOpacity>
 		);
 	}
@@ -47,7 +53,7 @@ export function Button({
 		return (
 			<TouchableOpacity
 				activeOpacity={0.7}
-				className="bg-surface rounded-lg py-3.5 px-6 flex-row items-center justify-center border border-border-default"
+				className="bg-surface rounded-lg py-3.5 px-6 flex-row items-center justify-center border border-white/10"
 				style={props.style}
 				{...props}
 			>
@@ -67,7 +73,7 @@ export function Button({
 			{...props}
 		>
 			{icon && <View className="mr-2.5">{icon}</View>}
-			<Text className="text-foreground-muted hover:text-foreground font-semibold text-base tracking-tight">
+			<Text className="text-foreground-muted font-semibold text-base tracking-tight">
 				{title}
 			</Text>
 		</TouchableOpacity>
@@ -87,8 +93,8 @@ const styles = StyleSheet.create({
 		top: 1,
 		left: 1,
 		right: 1,
-		height: 1,
-		backgroundColor: 'rgba(255,255,255,0.2)',
+		height: 1.5, // Slightly thicker for manual look
+		backgroundColor: 'rgba(255,255,255,0.3)',
 		borderRadius: 8,
 	},
 });

@@ -12,7 +12,6 @@ import { RefreshCcw, TrendingUp, Clock } from 'lucide-react-native';
 import { resourceApi } from '@/lib/api';
 import { Resource } from '@/types/resource';
 import { Background } from '@/components/Background';
-import { Card } from '@/components/Card';
 import { CustomText } from '@/components/CustomText';
 import { Button } from '@/components/Button';
 import HomeCard from '@/components/HomeCard';
