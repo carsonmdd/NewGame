@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { ResourceCard } from '@/components/ResourceCard';
 import { Resource } from '@/types/resource';
 import { getSearchSortMode } from '@/lib/searchSort';
-import { LinearText } from './ui/linear/LinearText';
+import { CustomText } from './CustomText';
 
 export function AlgoliaHits(props: UseHitsProps<Resource>) {
 	const { hits } = useHits(props);
@@ -30,12 +30,12 @@ export function AlgoliaHits(props: UseHitsProps<Resource>) {
 
 	if (visibleHits.length === 0) {
 		return (
-			<LinearText
+			<CustomText
 				variant="body"
 				className="text-foreground-muted text-sm mb-4"
 			>
 				No resources found.
-			</LinearText>
+			</CustomText>
 		);
 	}
 

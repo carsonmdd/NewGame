@@ -4,8 +4,8 @@ import React from 'react';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
 
 import { Resource } from '@/types/resource';
-import { LinearCard } from './ui/linear/LinearCard';
-import { LinearText } from './ui/linear/LinearText';
+import { Card } from './Card';
+import { CustomText } from './CustomText';
 
 type Props = {
 	item: Resource;
@@ -31,7 +31,7 @@ export function ResourceCard({ item }: Props) {
 			className="w-[48%] mb-4"
 			style={styles.cardContainer}
 		>
-			<LinearCard
+			<Card
 				intensity={12}
 				containerClassName="min-h-[190px] justify-between border-white/5 bg-white/[0.02]"
 			>
@@ -40,13 +40,13 @@ export function ResourceCard({ item }: Props) {
 					<View className="flex-1 mr-8">
 						{item.sourceType && (
 							<View className="bg-accent/10 self-start px-2 py-0.5 rounded-md border border-accent/20">
-								<LinearText
+								<CustomText
 									variant="label"
 									className="text-[8px] text-accent-bright font-bold"
 									numberOfLines={1}
 								>
 									{item.sourceType}
-								</LinearText>
+								</CustomText>
 							</View>
 						)}
 					</View>
@@ -58,24 +58,24 @@ export function ResourceCard({ item }: Props) {
 
 				{/* Bottom Content - Focus on Title */}
 				<View className="mt-4">
-					<LinearText variant="h3" numberOfLines={3}>
+					<CustomText variant="h3" numberOfLines={3}>
 						{item.title}
-					</LinearText>
+					</CustomText>
 
 					{/* Decorative accent line */}
 					<View className="h-[2px] w-8 bg-accent/30 rounded-full mt-3" />
 
 					{item.author && (
-						<LinearText
+						<CustomText
 							variant="label"
 							className="text-[9px] mt-2 text-foreground-muted"
 							numberOfLines={1}
 						>
 							{item.author}
-						</LinearText>
+						</CustomText>
 					)}
 				</View>
-			</LinearCard>
+			</Card>
 		</TouchableOpacity>
 	);
 }

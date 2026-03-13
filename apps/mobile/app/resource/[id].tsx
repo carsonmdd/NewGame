@@ -1,19 +1,26 @@
-import { ChevronLeft, Bookmark, Globe, User, Calendar, Flag, Lightbulb, Construction, HelpCircle, Link as LinkIcon } from 'lucide-react-native';
+import {
+	ChevronLeft,
+	Bookmark,
+	Globe,
+	User,
+	Calendar,
+	Flag,
+	Lightbulb,
+	Construction,
+	HelpCircle,
+	Link as LinkIcon,
+} from 'lucide-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import {
-	ScrollView,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useSavedResources } from '@/contexts/SavedResourcesContext';
 import { Resource } from '@/types/resource';
-import { LinearBackground } from '@/components/ui/linear/LinearBackground';
-import { LinearCard } from '@/components/ui/linear/LinearCard';
-import { LinearText } from '@/components/ui/linear/LinearText';
-import { LinearButton } from '@/components/ui/linear/LinearButton';
+import { Background } from '@/components/Background';
+import { Card } from '@/components/Card';
+import { CustomText } from '@/components/CustomText';
+import { Button } from '@/components/Button';
 
 export default function ResourceDetailScreen() {
 	const { resource: resourceParam } = useLocalSearchParams<{
@@ -34,16 +41,21 @@ export default function ResourceDetailScreen() {
 
 	if (!resource) {
 		return (
-			<LinearBackground>
+			<Background>
 				<SafeAreaView className="flex-1 items-center justify-center">
-					<LinearText variant="body-large" className="text-foreground-muted mb-6">Resource not found</LinearText>
-					<LinearButton
+					<CustomText
+						variant="body-large"
+						className="text-foreground-muted mb-6"
+					>
+						Resource not found
+					</CustomText>
+					<Button
 						title="Go Back"
 						onPress={() => router.back()}
 						variant="secondary"
 					/>
 				</SafeAreaView>
-			</LinearBackground>
+			</Background>
 		);
 	}
 
@@ -59,7 +71,7 @@ export default function ResourceDetailScreen() {
 	};
 
 	return (
-		<LinearBackground>
+		<Background>
 			<SafeAreaView edges={['top']} className="z-10">
 				<View className="flex-row justify-between items-center px-6 py-4">
 					<TouchableOpacity
@@ -88,34 +100,47 @@ export default function ResourceDetailScreen() {
 			>
 				{/* Header Section */}
 				<View className="mb-10">
-					<LinearText variant="label" className="mb-3 text-accent tracking-[0.2em]">
+					<CustomText
+						variant="label"
+						className="mb-3 text-accent tracking-[0.2em]"
+					>
 						{resource.sourceType || 'RESOURCE'}
-					</LinearText>
-					<LinearText variant="h1" className="mb-6 leading-tight">
+					</CustomText>
+					<CustomText variant="h1" className="mb-6 leading-tight">
 						{resource.title}
-					</LinearText>
+					</CustomText>
 
 					<View className="flex-row flex-wrap items-center gap-y-3">
 						<View className="flex-row items-center mr-6 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
 							<User size={14} color="#8A8F98" />
-							<LinearText variant="body" className="text-foreground-muted text-sm ml-2 font-medium">
+							<CustomText
+								variant="body"
+								className="text-foreground-muted text-sm ml-2 font-medium"
+							>
 								{resource.author || 'Unknown Author'}
-							</LinearText>
+							</CustomText>
 						</View>
 						<View className="flex-row items-center bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
 							<Globe size={14} color="#8A8F98" />
-							<LinearText variant="body" className="text-foreground-muted text-sm ml-2 font-medium">
+							<CustomText
+								variant="body"
+								className="text-foreground-muted text-sm ml-2 font-medium"
+							>
 								{resource.source || 'Unknown Source'}
-							</LinearText>
+							</CustomText>
 						</View>
 					</View>
 
 					{resource.date && (
 						<View className="flex-row items-center mt-5">
 							<Calendar size={12} color="rgba(255,255,255,0.4)" />
-							<LinearText variant="label" className="ml-2 lowercase tracking-normal">
-								Published: {new Date(resource.date).toLocaleDateString()}
-							</LinearText>
+							<CustomText
+								variant="label"
+								className="ml-2 lowercase tracking-normal"
+							>
+								Published:{' '}
+								{new Date(resource.date).toLocaleDateString()}
+							</CustomText>
 						</View>
 					)}
 				</View>
@@ -149,18 +174,24 @@ export default function ResourceDetailScreen() {
 
 				{resource.keywords && resource.keywords.length > 0 && (
 					<View className="mt-8">
-						<LinearText variant="label" className="mb-4 tracking-widest text-foreground-subtle">
+						<CustomText
+							variant="label"
+							className="mb-4 tracking-widest text-foreground-subtle"
+						>
 							Keywords
-						</LinearText>
+						</CustomText>
 						<View className="flex-row flex-wrap gap-2.5">
 							{resource.keywords.map((keyword, index) => (
 								<View
 									key={index}
 									className="bg-accent/10 px-4 py-2 rounded-full border border-accent/20"
 								>
-									<LinearText variant="body" className="text-accent text-xs font-semibold tracking-tight">
+									<CustomText
+										variant="body"
+										className="text-accent text-xs font-semibold tracking-tight"
+									>
 										{keyword}
-									</LinearText>
+									</CustomText>
 								</View>
 							))}
 						</View>
@@ -170,7 +201,7 @@ export default function ResourceDetailScreen() {
 				{/* Original Link */}
 				{resource.url && (
 					<View className="mt-12">
-						<LinearButton
+						<Button
 							title="View Original Source"
 							icon={<LinkIcon size={18} color="white" />}
 							onPress={() => {}}
@@ -178,7 +209,7 @@ export default function ResourceDetailScreen() {
 					</View>
 				)}
 			</ScrollView>
-		</LinearBackground>
+		</Background>
 	);
 }
 
@@ -199,18 +230,21 @@ function DetailSection({
 				<View className="w-9 h-9 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 mr-3.5">
 					{icon}
 				</View>
-				<LinearText variant="label" className="text-foreground-subtle">
+				<CustomText variant="label" className="text-foreground-subtle">
 					{title}
-				</LinearText>
+				</CustomText>
 			</View>
-			<LinearCard
+			<Card
 				intensity={10}
 				containerClassName="p-6 border-white/5 bg-white/[0.03]"
 			>
-				<LinearText variant="body" className="text-foreground/90 leading-relaxed font-medium">
+				<CustomText
+					variant="body"
+					className="text-foreground/90 leading-relaxed font-medium"
+				>
 					{content}
-				</LinearText>
-			</LinearCard>
+				</CustomText>
+			</Card>
 		</View>
 	);
 }

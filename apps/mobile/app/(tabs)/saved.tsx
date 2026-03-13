@@ -1,4 +1,11 @@
-import { Trash2, X, Search, Plus, Bookmark, ChevronLeft, LayoutGrid } from 'lucide-react-native';
+import {
+	Trash2,
+	X,
+	Search,
+	Plus,
+	Bookmark,
+	LayoutGrid,
+} from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
@@ -17,10 +24,10 @@ import {
 
 import { useSavedResources } from '@/contexts/SavedResourcesContext';
 import { Resource } from '@/types/resource';
-import { LinearBackground } from '@/components/ui/linear/LinearBackground';
-import { LinearCard } from '@/components/ui/linear/LinearCard';
-import { LinearText } from '@/components/ui/linear/LinearText';
-import { LinearButton } from '@/components/ui/linear/LinearButton';
+import { Background } from '@/components/Background';
+import { Card } from '@/components/Card';
+import { CustomText } from '@/components/CustomText';
+import { Button } from '@/components/Button';
 
 type Collection = {
 	id: string;
@@ -203,21 +210,31 @@ export default function SavedScreen() {
 	}, [openCollection, filteredSavedResources]);
 
 	return (
-		<LinearBackground>
+		<Background>
 			<SafeAreaView className="flex-1" edges={['left', 'right']}>
-				<View className="flex-1 px-6" style={{ paddingTop: insets.top }}>
+				<View
+					className="flex-1 px-6"
+					style={{ paddingTop: insets.top }}
+				>
 					<ScrollView
 						contentContainerClassName="pb-24 pt-4"
 						showsVerticalScrollIndicator={false}
 					>
 						<View className="mb-8">
-							<LinearText variant="label" className="text-accent tracking-[0.2em] mb-1">LIBRARY</LinearText>
-							<LinearText variant="h1">Saved</LinearText>
+							<CustomText
+								variant="label"
+								className="text-accent tracking-[0.2em] mb-1"
+							>
+								LIBRARY
+							</CustomText>
+							<CustomText variant="h1">Saved</CustomText>
 						</View>
 
 						<View className="flex-row items-center mb-6">
 							<LayoutGrid size={18} color="#5E6AD2" />
-							<LinearText variant="h3" className="ml-3">Collections</LinearText>
+							<CustomText variant="h3" className="ml-3">
+								Collections
+							</CustomText>
 						</View>
 
 						<View>
@@ -235,15 +252,23 @@ export default function SavedScreen() {
 													onPress={addCollection}
 													className="flex-1"
 												>
-													<LinearCard 
-														intensity={10} 
+													<Card
+														intensity={10}
 														containerClassName="h-44 items-center justify-center border-dashed border-white/20 bg-transparent"
 													>
 														<View className="w-12 h-12 rounded-full bg-white/5 items-center justify-center border border-white/10 mb-2">
-															<Plus size={24} color="#8A8F98" />
+															<Plus
+																size={24}
+																color="#8A8F98"
+															/>
 														</View>
-														<LinearText variant="label" className="text-foreground-muted">New List</LinearText>
-													</LinearCard>
+														<CustomText
+															variant="label"
+															className="text-foreground-muted"
+														>
+															New List
+														</CustomText>
+													</Card>
 												</TouchableOpacity>
 											);
 										}
@@ -258,24 +283,33 @@ export default function SavedScreen() {
 												}
 												className="flex-1"
 											>
-												<LinearCard
+												<Card
 													intensity={15}
 													containerClassName="h-44 justify-end p-5 border-white/5"
 												>
 													<View className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-accent/10 items-center justify-center border border-accent/20">
-														<Bookmark size={14} color="#5E6AD2" fill="#5E6AD2" />
+														<Bookmark
+															size={14}
+															color="#5E6AD2"
+															fill="#5E6AD2"
+														/>
 													</View>
-													<LinearText
+													<CustomText
 														variant="h3"
 														className="text-lg font-bold"
 														numberOfLines={1}
 													>
 														{c.name}
-													</LinearText>
-													<LinearText variant="label" className="text-[10px] mt-1 text-foreground-subtle">
-														{c.id === 'recent' ? `${savedResources.length} items` : 'Empty'}
-													</LinearText>
-												</LinearCard>
+													</CustomText>
+													<CustomText
+														variant="label"
+														className="text-[10px] mt-1 text-foreground-subtle"
+													>
+														{c.id === 'recent'
+															? `${savedResources.length} items`
+															: 'Empty'}
+													</CustomText>
+												</Card>
 											</TouchableOpacity>
 										);
 									})}
@@ -294,7 +328,7 @@ export default function SavedScreen() {
 						presentationStyle="fullScreen"
 						onRequestClose={closeModal}
 					>
-						<LinearBackground>
+						<Background>
 							<SafeAreaView
 								className="flex-1"
 								edges={['left', 'right']}
@@ -307,18 +341,24 @@ export default function SavedScreen() {
 									<View className="px-6 py-4 flex-row items-start justify-between">
 										<View className="flex-1 pr-4">
 											{openCollection?.id === 'recent' ? (
-												<LinearText variant="h2" numberOfLines={1}>
+												<CustomText
+													variant="h2"
+													numberOfLines={1}
+												>
 													{openCollectionName}
-												</LinearText>
+												</CustomText>
 											) : !isEditingTitle ? (
 												<TouchableOpacity
 													activeOpacity={0.8}
 													onPress={startEditingTitle}
 													className="py-1"
 												>
-													<LinearText variant="h2" numberOfLines={1}>
+													<CustomText
+														variant="h2"
+														numberOfLines={1}
+													>
 														{openCollectionName}
-													</LinearText>
+													</CustomText>
 												</TouchableOpacity>
 											) : (
 												<View>
@@ -335,7 +375,9 @@ export default function SavedScreen() {
 														autoFocus
 														maxLength={NAME_MAX}
 														returnKeyType="done"
-														onSubmitEditing={saveTitle}
+														onSubmitEditing={
+															saveTitle
+														}
 														autoCorrect={false}
 													/>
 												</View>
@@ -343,13 +385,17 @@ export default function SavedScreen() {
 										</View>
 
 										<View className="flex-row gap-3 items-center">
-											{openCollection?.id !== 'recent' && (
+											{openCollection?.id !==
+												'recent' && (
 												<TouchableOpacity
 													activeOpacity={0.7}
 													onPress={deleteCollection}
 													className="w-10 h-10 items-center justify-center rounded-xl bg-white/5 border border-white/10"
 												>
-													<Trash2 size={18} color="#EF4444" />
+													<Trash2
+														size={18}
+														color="#EF4444"
+													/>
 												</TouchableOpacity>
 											)}
 
@@ -365,16 +411,18 @@ export default function SavedScreen() {
 
 									{isEditingTitle && (
 										<View className="px-6 flex-row gap-3 mt-2 mb-4">
-											<LinearButton
+											<Button
 												title="Cancel"
 												onPress={() => {
-													setDraftName(openCollectionName);
+													setDraftName(
+														openCollectionName,
+													);
 													setIsEditingTitle(false);
 												}}
 												variant="secondary"
 												style={{ flex: 1 }}
 											/>
-											<LinearButton
+											<Button
 												title="Save"
 												onPress={saveTitle}
 												variant="primary"
@@ -385,19 +433,29 @@ export default function SavedScreen() {
 
 									{/* Modal Search Bar */}
 									<View className="px-6 flex-row items-center gap-3 mt-4">
-										<View 
+										<View
 											className={`flex-1 flex-row items-center bg-surface rounded-xl px-4 h-11 border ${isSearchFocused ? 'border-accent' : 'border-white/10'}`}
 										>
 											<Search
 												size={16}
-												color={isSearchFocused ? '#5E6AD2' : '#8A8F98'}
+												color={
+													isSearchFocused
+														? '#5E6AD2'
+														: '#8A8F98'
+												}
 												className="mr-2"
 											/>
 											<TextInput
 												value={collectionSearch}
-												onChangeText={setCollectionSearch}
-												onFocus={() => setIsSearchFocused(true)}
-												onBlur={() => setIsSearchFocused(false)}
+												onChangeText={
+													setCollectionSearch
+												}
+												onFocus={() =>
+													setIsSearchFocused(true)
+												}
+												onBlur={() =>
+													setIsSearchFocused(false)
+												}
 												placeholder="Search your collection"
 												placeholderTextColor="#8A8F98"
 												className="flex-1 text-foreground text-sm font-medium py-0"
@@ -420,12 +478,15 @@ export default function SavedScreen() {
 														onPress={() => {}}
 														className="flex-1"
 													>
-														<LinearCard
+														<Card
 															intensity={10}
 															containerClassName="h-40 items-center justify-center border-dashed border-white/20 bg-transparent"
 														>
-															<Plus size={32} color="#8A8F98" />
-														</LinearCard>
+															<Plus
+																size={32}
+																color="#8A8F98"
+															/>
+														</Card>
 													</TouchableOpacity>
 												);
 											}
@@ -438,7 +499,8 @@ export default function SavedScreen() {
 													className="flex-1"
 													onPress={() =>
 														router.push({
-															pathname: '/resource/[id]',
+															pathname:
+																'/resource/[id]',
 															params: {
 																id: resource.id,
 																resource:
@@ -449,30 +511,30 @@ export default function SavedScreen() {
 														})
 													}
 												>
-													<LinearCard
+													<Card
 														intensity={15}
 														containerClassName="h-40 justify-end p-4 border-white/5"
 													>
-														<LinearText
+														<CustomText
 															variant="h3"
 															className="text-sm font-bold leading-tight"
 															numberOfLines={3}
 														>
 															{resource.title}
-														</LinearText>
-													</LinearCard>
+														</CustomText>
+													</Card>
 												</TouchableOpacity>
 											);
 										}}
 										ListEmptyComponent={
 											openCollection?.id === 'recent' ? (
 												<View className="py-10 items-center">
-													<LinearText
+													<CustomText
 														variant="body"
 														className="text-foreground-muted text-center"
 													>
 														No saved resources yet.
-													</LinearText>
+													</CustomText>
 												</View>
 											) : null
 										}
@@ -480,10 +542,10 @@ export default function SavedScreen() {
 									/>
 								</View>
 							</SafeAreaView>
-						</LinearBackground>
+						</Background>
 					</Modal>
 				</View>
 			</SafeAreaView>
-		</LinearBackground>
+		</Background>
 	);
 }

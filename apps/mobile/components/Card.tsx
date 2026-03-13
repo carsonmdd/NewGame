@@ -3,19 +3,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Platform, StyleSheet, View, ViewProps } from 'react-native';
 
-interface LinearCardProps extends ViewProps {
+interface CardProps extends ViewProps {
 	children: React.ReactNode;
 	intensity?: number;
 	containerClassName?: string;
 }
 
-export function LinearCard({
+export function Card({
 	children,
 	intensity = 20,
 	containerClassName = '',
 	style,
 	...props
-}: LinearCardProps) {
+}: CardProps) {
 	const Container = Platform.OS === 'ios' ? BlurView : View;
 
 	return (

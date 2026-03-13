@@ -7,14 +7,14 @@ import {
 	ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { RefreshCcw, TrendingUp, Clock, User } from 'lucide-react-native';
+import { RefreshCcw, TrendingUp, Clock } from 'lucide-react-native';
 
 import { resourceApi } from '@/lib/api';
 import { Resource } from '@/types/resource';
-import { LinearBackground } from '@/components/ui/linear/LinearBackground';
-import { LinearCard } from '@/components/ui/linear/LinearCard';
-import { LinearText } from '@/components/ui/linear/LinearText';
-import { LinearButton } from '@/components/ui/linear/LinearButton';
+import { Background } from '@/components/Background';
+import { Card } from '@/components/Card';
+import { CustomText } from '@/components/CustomText';
+import { Button } from '@/components/Button';
 import HomeCard from '@/components/HomeCard';
 
 export default function HomeScreen() {
@@ -53,17 +53,17 @@ export default function HomeScreen() {
 	};
 
 	return (
-		<LinearBackground>
+		<Background>
 			<SafeAreaView edges={['top']} className="flex-1">
 				<View className="px-6 py-4 flex-row justify-between items-center">
 					<View>
-						<LinearText
+						<CustomText
 							variant="label"
 							className="text-accent tracking-[0.2em] mb-1"
 						>
 							DISCOVER
-						</LinearText>
-						<LinearText variant="h1">Home</LinearText>
+						</CustomText>
+						<CustomText variant="h1">Home</CustomText>
 					</View>
 					<TouchableOpacity
 						onPress={loadResources}
@@ -79,13 +79,13 @@ export default function HomeScreen() {
 				>
 					{error ? (
 						<View className="py-20 items-center px-10">
-							<LinearText
+							<CustomText
 								variant="body"
 								className="text-red-400 text-center mb-6"
 							>
 								{error}
-							</LinearText>
-							<LinearButton
+							</CustomText>
+							<Button
 								title="Retry"
 								onPress={loadResources}
 								variant="secondary"
@@ -97,9 +97,9 @@ export default function HomeScreen() {
 					<View className="mb-10">
 						<View className="flex-row items-center mb-5">
 							<TrendingUp size={18} color="#5E6AD2" />
-							<LinearText variant="h2" className="ml-3">
+							<CustomText variant="h2" className="ml-3">
 								Trending
-							</LinearText>
+							</CustomText>
 						</View>
 
 						{loading && trending.length === 0 ? (
@@ -121,9 +121,9 @@ export default function HomeScreen() {
 					<View className="mb-10">
 						<View className="flex-row items-center mb-5">
 							<Clock size={18} color="#5E6AD2" />
-							<LinearText variant="h2" className="ml-3">
+							<CustomText variant="h2" className="ml-3">
 								Latest
-							</LinearText>
+							</CustomText>
 						</View>
 
 						{loading && latest.length === 0 ? (
@@ -142,6 +142,6 @@ export default function HomeScreen() {
 					</View>
 				</ScrollView>
 			</SafeAreaView>
-		</LinearBackground>
+		</Background>
 	);
 }

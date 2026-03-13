@@ -8,18 +8,18 @@ import {
 	StyleSheet,
 } from 'react-native';
 
-interface LinearButtonProps extends TouchableOpacityProps {
+interface ButtonProps extends TouchableOpacityProps {
 	variant?: 'primary' | 'secondary' | 'ghost';
 	title: string;
 	icon?: React.ReactNode;
 }
 
-export function LinearButton({
+export function Button({
 	variant = 'primary',
 	title,
 	icon,
 	...props
-}: LinearButtonProps) {
+}: ButtonProps) {
 	if (variant === 'primary') {
 		return (
 			<TouchableOpacity

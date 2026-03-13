@@ -31,18 +31,18 @@ const FloatingBlob = ({
 		translateX.value = withRepeat(
 			withSequence(
 				withTiming(40, { duration: duration / 2 }),
-				withTiming(-40, { duration: duration / 2 })
+				withTiming(-40, { duration: duration / 2 }),
 			),
 			-1,
-			true
+			true,
 		);
 		translateY.value = withRepeat(
 			withSequence(
 				withTiming(-50, { duration: duration / 1.5 }),
-				withTiming(50, { duration: duration / 1.5 })
+				withTiming(50, { duration: duration / 1.5 }),
 			),
 			-1,
-			true
+			true,
 		);
 	}, []);
 
@@ -78,7 +78,7 @@ const FloatingBlob = ({
 	);
 };
 
-export function LinearBackground({ children }: { children: React.ReactNode }) {
+export function Background({ children }: { children: React.ReactNode }) {
 	const { width, height } = useWindowDimensions();
 
 	return (

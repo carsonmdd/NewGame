@@ -1,20 +1,20 @@
 import React from 'react';
 import { Text, TextProps } from 'react-native';
 
-interface LinearTextProps extends TextProps {
+interface CustomTextProps extends TextProps {
 	variant?: 'display' | 'h1' | 'h2' | 'h3' | 'body' | 'body-large' | 'label';
 	gradient?: boolean;
 	children: React.ReactNode;
 }
 
-export function LinearText({
+export function CustomText({
 	variant = 'body',
 	gradient = false,
 	children,
 	style,
 	className,
 	...props
-}: LinearTextProps) {
+}: CustomTextProps) {
 	const variantStyles: Record<string, string> = {
 		display:
 			'text-7xl font-semibold tracking-tighter leading-tight text-foreground',

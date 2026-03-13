@@ -9,14 +9,14 @@ import {
 	SafeAreaView,
 	useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { LinearBackground } from '@/components/ui/linear/LinearBackground';
-import { LinearText } from '@/components/ui/linear/LinearText';
+import { Background } from '@/components/Background';
+import { CustomText } from '@/components/CustomText';
 
 export default function SearchScreen() {
 	const insets = useSafeAreaInsets();
 
 	return (
-		<LinearBackground>
+		<Background>
 			<SafeAreaView className="flex-1" edges={['left', 'right']}>
 				<View className="flex-1" style={{ paddingTop: insets.top }}>
 					{/* Keep Filters Updated */}
@@ -27,13 +27,13 @@ export default function SearchScreen() {
 						showsVerticalScrollIndicator={false}
 					>
 						<View className="mb-6">
-							<LinearText
+							<CustomText
 								variant="label"
 								className="text-accent tracking-[0.2em] mb-1"
 							>
 								RESOURCES
-							</LinearText>
-							<LinearText variant="h1">Search</LinearText>
+							</CustomText>
+							<CustomText variant="h1">Search</CustomText>
 						</View>
 
 						{/* Search bar with Algolia */}
@@ -44,6 +44,6 @@ export default function SearchScreen() {
 					</ScrollView>
 				</View>
 			</SafeAreaView>
-		</LinearBackground>
+		</Background>
 	);
 }
