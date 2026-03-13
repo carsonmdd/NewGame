@@ -12,44 +12,61 @@ import Animated, {
 type BlobProps = {
 	color: string;
 	size: number;
-	initialX: number;
-	initialY: number;
-	duration?: number;
+	initialTop?: number | string;
+	initialLeft?: number | string;
+	initialBottom?: number | string;
+	initialRight?: number | string;
+	opacity: number;
+	duration: number;
+	delay?: number;
 };
 
-const FloatingBlob = ({
+const AmbientBlob = ({
 	color,
 	size,
-	initialX,
-	initialY,
-	duration = 10000,
+	initialTop,
+	initialLeft,
+	initialBottom,
+	initialRight,
+	opacity,
+	duration,
+	delay = 0,
 }: BlobProps) => {
-	const translateX = useSharedValue(0);
 	const translateY = useSharedValue(0);
+	const rotate = useSharedValue(0);
 
 	useEffect(() => {
-		translateX.value = withRepeat(
-			withSequence(
-				withTiming(40, { duration: duration / 2 }),
-				withTiming(-40, { duration: duration / 2 }),
-			),
-			-1,
-			true,
-		);
-		translateY.value = withRepeat(
-			withSequence(
-				withTiming(-50, { duration: duration / 1.5 }),
-				withTiming(50, { duration: duration / 1.5 }),
-			),
-			-1,
-			true,
-		);
-	}, []);
+		const startAnimation = () => {
+			translateY.value = withRepeat(
+				withSequence(
+					withTiming(-20, { duration: duration / 2 }),
+					withTiming(0, { duration: duration / 2 }),
+				),
+				-1,
+				true,
+			);
+			rotate.value = withRepeat(
+				withSequence(
+					withTiming(1, { duration: duration / 2 }),
+					withTiming(0, { duration: duration / 2 }),
+				),
+				-1,
+				true,
+			);
+		};
+
+		if (delay > 0) {
+			const timeout = setTimeout(startAnimation, delay);
+			return () => clearTimeout(timeout);
+		} else {
+			startAnimation();
+		}
+	}, [duration, delay, translateY, rotate]);
 
 	const animatedStyle = useAnimatedStyle(() => ({
 		transform: [
-			{ translateX: translateX.value },
 			{ translateY: translateY.value },
+			{ rotate: `${rotate.value}deg` },
 		],
 	}));
 
@@ -60,19 +77,28 @@ const FloatingBlob = ({
 					position: 'absolute',
 					width: size,
 					height: size,
-					left: initialX,
-					top: initialY,
-					opacity: 0.1,
+					borderRadius: size / 2,
+					backgroundColor: color,
+					opacity: opacity,
+					top: initialTop,
+					left: initialLeft,
+					bottom: initialBottom,
+					right: initialRight,
 				},
 				animatedStyle,
+				{
+					// Simulate blur using a large scale or just rely on the subtle opacity
+					// In React Native, blur is hard on Android without a library,
+					// but we can use a gradient to soften the edges.
+				},
 			]}
 			pointerEvents="none"
 		>
 			<LinearGradient
 				colors={[color, 'transparent']}
+				style={{ flex: 1, borderRadius: size / 2 }}
 				start={[0.5, 0.5]}
 				end={[1, 1]}
-				style={{ flex: 1, borderRadius: size / 2 }}
 			/>
 		</Animated.View>
 	);
@@ -83,35 +109,53 @@ export function Background({ children }: { children: React.ReactNode }) {
 
 	return (
 		<View className="flex-1 bg-background-deep">
-			{/* Base Gradient Layer */}
+			{/* Base Radial-like Gradient Layer */}
 			<LinearGradient
 				colors={['#0a0a0f', '#050506', '#020203']}
 				locations={[0, 0.5, 1]}
 				style={StyleSheet.absoluteFill}
 			/>
 
-			{/* Animated Blobs */}
+			{/* Grid Simulation - Very subtle */}
+			<View
+				style={[StyleSheet.absoluteFill, { opacity: 0.05 }]}
+				pointerEvents="none"
+			>
+				{/* We can't easily do a grid without SVG or an image, so we'll focus on the blobs */}
+			</View>
+
+			{/* Animated Ambient Blobs - Based on Web Admin Dashboard */}
 			<View style={StyleSheet.absoluteFill} pointerEvents="none">
-				<FloatingBlob
+				{/* Top Leftish: accent-blue/10 */}
+				<AmbientBlob
 					color="#5E6AD2"
-					size={width * 1.5}
-					initialX={-width * 0.4}
-					initialY={-height * 0.3}
-					duration={12000}
-				/>
-				<FloatingBlob
-					color="#818CF8"
-					size={width * 1.2}
-					initialX={width * 0.5}
-					initialY={height * 0.2}
+					size={600}
+					initialTop="-10%"
+					initialLeft="10%"
+					opacity={0.1}
 					duration={15000}
 				/>
-				<FloatingBlob
-					color="#4F46E5"
-					size={width * 1.4}
-					initialX={-width * 0.5}
-					initialY={height * 0.6}
+
+				{/* Bottom Rightish: purple-500/5 */}
+				<AmbientBlob
+					color="#A855F7"
+					size={500}
+					initialBottom="-10%"
+					initialRight="5%"
+					opacity={0.05}
+					duration={12000}
+					delay={4000}
+				/>
+
+				{/* Middle Rightish: indigo-500/5 */}
+				<AmbientBlob
+					color="#6366F1"
+					size={400}
+					initialTop="30%"
+					initialRight="-5%"
+					opacity={0.05}
 					duration={18000}
+					delay={8000}
 				/>
 			</View>
 

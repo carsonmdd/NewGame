@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, TextProps } from 'react-native';
+import { cn } from '@/lib/utils';
 
 interface CustomTextProps extends TextProps {
 	variant?: 'display' | 'h1' | 'h2' | 'h3' | 'body' | 'body-large' | 'label';
@@ -27,10 +28,9 @@ export function CustomText({
 	};
 
 	const baseClass = variantStyles[variant] || variantStyles.body;
-	const combinedClassName = `${baseClass} ${className || ''}`;
 
 	return (
-		<Text {...props} className={combinedClassName} style={style}>
+		<Text {...props} className={cn(baseClass, className)} style={style}>
 			{children}
 		</Text>
 	);
