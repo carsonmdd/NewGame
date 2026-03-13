@@ -7,8 +7,7 @@ import { useRefinementList } from 'react-instantsearch-core';
  */
 
 export function AlgoliaFilterWidgets() {
-  useRefinementList({ attribute: 'resourceType' });
-  useRefinementList({ attribute: 'difficulty' });
+  useRefinementList({ attribute: 'keywords' });
 
   return null;
 }
