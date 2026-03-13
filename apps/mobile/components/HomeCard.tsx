@@ -22,7 +22,7 @@ const HomeCard = ({ item, handleResourcePress }: Props) => {
 				intensity={15}
 				containerClassName="h-48 justify-end p-6 border-white/5"
 			>
-				<CustomText variant="label" className="text-accent/80 mb-2">
+				<CustomText variant="label" className="text-accent-bright mb-2">
 					{item.sourceType || 'TRENDING'}
 				</CustomText>
 				<CustomText
