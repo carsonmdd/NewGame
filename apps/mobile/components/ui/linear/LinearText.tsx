@@ -18,9 +18,9 @@ export function LinearText({
 	const variantStyles: Record<string, string> = {
 		display:
 			'text-7xl font-semibold tracking-tighter leading-tight text-foreground',
-		h1: 'text-5xl font-semibold tracking-tight leading-tight text-foreground',
-		h2: 'text-3xl font-semibold tracking-tight leading-snug text-foreground',
-		h3: 'text-xl font-semibold tracking-tight leading-normal text-foreground',
+		h1: 'text-3xl font-semibold tracking-tight leading-tight text-foreground',
+		h2: 'text-xl font-semibold tracking-tight leading-snug text-foreground',
+		h3: 'text-lg font-semibold tracking-tight leading-normal text-foreground',
 		'body-large': 'text-lg font-normal leading-relaxed text-foreground',
 		body: 'text-base font-normal leading-relaxed text-foreground',
 		label: 'text-xs font-mono tracking-widest uppercase text-foreground-muted',

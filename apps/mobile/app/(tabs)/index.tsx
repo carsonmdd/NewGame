@@ -63,7 +63,7 @@ export default function HomeScreen() {
 						>
 							DISCOVER
 						</LinearText>
-						<LinearText variant="h2">Home</LinearText>
+						<LinearText variant="h1">Home</LinearText>
 					</View>
 					<TouchableOpacity
 						onPress={loadResources}
@@ -97,7 +97,7 @@ export default function HomeScreen() {
 					<View className="mb-10">
 						<View className="flex-row items-center mb-5">
 							<TrendingUp size={18} color="#5E6AD2" />
-							<LinearText variant="h3" className="ml-3">
+							<LinearText variant="h2" className="ml-3">
 								Trending
 							</LinearText>
 						</View>
@@ -121,7 +121,7 @@ export default function HomeScreen() {
 					<View className="mb-10">
 						<View className="flex-row items-center mb-5">
 							<Clock size={18} color="#5E6AD2" />
-							<LinearText variant="h3" className="ml-3">
+							<LinearText variant="h2" className="ml-3">
 								Latest
 							</LinearText>
 						</View>
