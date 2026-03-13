@@ -7,9 +7,9 @@ import ResourceCard from '../ResourceCard';
 import ResourceForm from '../ResourceForm';
 import SearchBar from '../SearchBar';
 import { Button } from '@/components/ui/button';
-import { Plus, SortAsc, Filter, Tag, X } from 'lucide-react';
+import { Plus, SortAsc, Tag, X } from 'lucide-react';
 
-type OpenDropdown = null | 'newest' | 'language' | 'tags';
+type OpenDropdown = null | 'newest' | 'tags';
 
 const CatalogView = () => {
 	const [resources, setResources] = useState<Resource[]>([]);
@@ -22,9 +22,6 @@ const CatalogView = () => {
 
 	const [search, setSearch] = useState('');
 	const [newestOrder, setNewestOrder] = useState<'desc' | 'asc'>('desc');
-	const [selectedResourceType, setSelectedResourceType] = useState<
-		'all' | Resource['resourceType']
-	>('all');
 	const [selectedTag, setSelectedTag] = useState<'all' | string>('all');
 
 	const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
@@ -90,18 +87,12 @@ const CatalogView = () => {
 			await resourceApi.delete(resource.sk);
 			loadResources();
 		} catch {
-			alert('Failed to delete resource. Check CORS and Lambda logs.');
+			alert('Failed to delete resource.');
 		}
 	};
 
-	const resourceTypes = useMemo(() => {
-		return Array.from(
-			new Set(resources.map((r) => r.resourceType)),
-		) as Resource['resourceType'][];
-	}, [resources]);
-
 	const allTags = useMemo(() => {
-		return Array.from(new Set(resources.flatMap((r) => r.tags))).sort(
+		return Array.from(new Set(resources.flatMap((r) => r.keywords))).sort(
 			(a, b) => a.localeCompare(b),
 		);
 	}, [resources]);
@@ -113,31 +104,29 @@ const CatalogView = () => {
 
 		if (normalizedSearch) {
 			result = result.filter((resource) => {
-				const title = resource.title.toLowerCase();
-				const description = resource.description.toLowerCase();
-				const resourceType = resource.resourceType.toLowerCase();
-				const difficulty = resource.difficulty.toLowerCase();
-				const tagsText = resource.tags.join(' ').toLowerCase();
+				const searchableText = [
+					resource.title,
+					resource.author,
+					resource.source,
+					resource.centralClaim,
+					resource.coreKnowledge,
+					resource.practicalTakeaway,
+					...resource.keywords,
+					...resource.adjacentTopics,
+					resource.syntheticQuery1,
+					resource.syntheticQuery2,
+					resource.syntheticQuery3,
+				]
+					.join(' ')
+					.toLowerCase();
 
-				return (
-					title.includes(normalizedSearch) ||
-					description.includes(normalizedSearch) ||
-					resourceType.includes(normalizedSearch) ||
-					difficulty.includes(normalizedSearch) ||
-					tagsText.includes(normalizedSearch)
-				);
+				return searchableText.includes(normalizedSearch);
 			});
-		}
-
-		if (selectedResourceType !== 'all') {
-			result = result.filter(
-				(resource) => resource.resourceType === selectedResourceType,
-			);
 		}
 
 		if (selectedTag !== 'all') {
 			result = result.filter((resource) =>
-				resource.tags.includes(selectedTag),
+				resource.keywords.includes(selectedTag),
 			);
 		}
 
@@ -153,7 +142,7 @@ const CatalogView = () => {
 		});
 
 		return result;
-	}, [resources, search, selectedResourceType, selectedTag, newestOrder]);
+	}, [resources, search, selectedTag, newestOrder]);
 
 	return (
 		<div
@@ -180,7 +169,7 @@ const CatalogView = () => {
 						size="lg"
 					>
 						<Plus className="mr-2 size-5" />
-						Create New
+						Create Resource
 					</Button>
 				</div>
 			</header>
@@ -247,60 +236,6 @@ const CatalogView = () => {
 								variant="secondary"
 								onClick={() =>
 									setOpenDropdown((prev) =>
-										prev === 'language' ? null : 'language',
-									)
-								}
-								className="w-full"
-							>
-								<Filter className="mr-2 size-4" />
-								{selectedResourceType === 'all'
-									? 'All Types'
-									: selectedResourceType}
-							</Button>
-
-							{openDropdown === 'language' && (
-								<div className="absolute top-full left-0 mt-2 w-48 glass rounded-xl z-30 overflow-hidden max-h-72 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-									<button
-										type="button"
-										onClick={() => {
-											setSelectedResourceType('all');
-											setOpenDropdown(null);
-										}}
-										className={`w-full px-4 py-2.5 text-left text-sm hover:bg-white/5 transition-colors ${
-											selectedResourceType === 'all'
-												? 'text-accent-blue bg-accent-blue/5'
-												: 'text-foreground'
-										}`}
-									>
-										All Types
-									</button>
-
-									{resourceTypes.map((type) => (
-										<button
-											key={type}
-											type="button"
-											onClick={() => {
-												setSelectedResourceType(type);
-												setOpenDropdown(null);
-											}}
-											className={`w-full px-4 py-2.5 text-left text-sm hover:bg-white/5 capitalize transition-colors ${
-												selectedResourceType === type
-													? 'text-accent-blue bg-accent-blue/5'
-													: 'text-foreground'
-											}`}
-										>
-											{type}
-										</button>
-									))}
-								</div>
-							)}
-						</div>
-
-						<div className="relative flex-1 md:flex-initial">
-							<Button
-								variant="secondary"
-								onClick={() =>
-									setOpenDropdown((prev) =>
 										prev === 'tags' ? null : 'tags',
 									)
 								}
@@ -308,7 +243,7 @@ const CatalogView = () => {
 							>
 								<Tag className="mr-2 size-4" />
 								{selectedTag === 'all'
-									? 'All Tags'
+									? 'All Keywords'
 									: selectedTag}
 							</Button>
 
@@ -326,7 +261,7 @@ const CatalogView = () => {
 												: 'text-foreground'
 										}`}
 									>
-										All Tags
+										All Keywords
 									</button>
 
 									{allTags.map((tag) => (
@@ -363,19 +298,16 @@ const CatalogView = () => {
 							<span className="text-foreground font-semibold">
 								{resources.length}
 							</span>{' '}
-							resources
+							records
 						</p>
 
-						{(search ||
-							selectedResourceType !== 'all' ||
-							selectedTag !== 'all') && (
+						{(search || selectedTag !== 'all') && (
 							<Button
 								variant="ghost"
 								size="sm"
 								onClick={() => {
 									setSearch('');
 									setNewestOrder('desc');
-									setSelectedResourceType('all');
 									setSelectedTag('all');
 									setOpenDropdown(null);
 								}}
@@ -426,8 +358,8 @@ const CatalogView = () => {
 								<div className="py-20 text-center">
 									<p className="text-muted-foreground text-lg">
 										{resources.length > 0
-											? 'No matching resources found.'
-											: 'Your catalog is empty. Create your first resource!'}
+											? 'No matching records found.'
+											: 'The catalog is empty. Create your first resource!'}
 									</p>
 									{resources.length === 0 && (
 										<Button
@@ -449,7 +381,7 @@ const CatalogView = () => {
 
 			{editingResource && (
 				<div className="fixed inset-0 bg-bg-base/80 backdrop-blur-md flex items-center justify-center p-6 z-50 animate-in fade-in duration-300">
-					<div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto glass rounded-2xl p-1 shadow-2xl">
+					<div className="w-full max-w-5xl max-h-[95vh] overflow-y-auto glass rounded-2xl p-1 shadow-2xl">
 						<ResourceForm
 							initialData={
 								editingResource === 'new'

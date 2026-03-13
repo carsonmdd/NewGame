@@ -2,7 +2,7 @@
 
 import { Resource } from '@/types/resource';
 import { Button } from '@/components/ui/button';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2, Link as LinkIcon, User, BookOpen } from 'lucide-react';
 import { useState, useRef, MouseEvent } from 'react';
 
 export default function ResourceCard({
@@ -40,49 +40,68 @@ export default function ResourceCard({
 				}}
 			/>
 
-			<div className="relative flex items-start justify-between gap-4">
-				<div className="min-w-0">
-					<div className="flex items-center gap-3">
-						<h3 className="text-lg font-semibold text-foreground tracking-tight truncate">
+			<div className="relative flex flex-col h-full">
+				<div className="flex items-start justify-between gap-4 mb-4">
+					<div className="min-w-0">
+						<h3 className="text-lg font-semibold text-foreground tracking-tight leading-snug">
 							{resource.title || 'Untitled Resource'}
 						</h3>
+						<div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-muted-foreground">
+							<span className="flex items-center gap-1">
+								<User className="size-3" />
+								{resource.author || 'Unknown Author'}
+							</span>
+							<span className="flex items-center gap-1">
+								<BookOpen className="size-3" />
+								{resource.source || 'Unknown Source'}
+							</span>
+						</div>
 					</div>
 
-					<p className="mt-3 text-sm text-muted-foreground leading-relaxed line-clamp-2">
-						{resource.description ||
-							'No description provided for this resource.'}
+					<div className="flex items-center gap-1 shrink-0">
+						<a
+							href={resource.url}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="p-2 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors"
+						>
+							<LinkIcon className="size-4" />
+						</a>
+						<Button
+							variant="ghost"
+							size="icon-sm"
+							onClick={() => onEdit(resource)}
+							title="Edit"
+						>
+							<Edit2 className="size-4" />
+						</Button>
+					</div>
+				</div>
+
+				<div className="flex-1">
+					<p className="text-sm text-muted-foreground/90 leading-relaxed line-clamp-3 italic">
+						{`"${resource.centralClaim}"`}
 					</p>
 				</div>
 
-				<Button
-					variant="ghost"
-					size="icon-sm"
-					onClick={() => onEdit(resource)}
-					className="opacity-0 group-hover:opacity-100 transition-opacity"
-					title="Edit"
-				>
-					<Edit2 className="size-4" />
-				</Button>
-			</div>
-
-			<div className="relative mt-6 flex flex-wrap items-center gap-2">
-				{(resource.tags ?? []).slice(0, 4).map((t) => (
-					<span
-						key={t}
-						className="px-2.5 py-0.5 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-[10px] font-mono tracking-wider uppercase"
+				<div className="mt-6 flex flex-wrap items-center gap-1.5">
+					{(resource.keywords ?? []).slice(0, 3).map((t) => (
+						<span
+							key={t}
+							className="px-2 py-0.5 rounded-md bg-accent-blue/5 border border-accent-blue/10 text-accent-blue/80 text-[10px] font-medium tracking-wide"
+						>
+							{t}
+						</span>
+					))}
+					<Button
+						variant="ghost"
+						size="icon-xs"
+						onClick={() => onDelete(resource)}
+						className="ml-auto text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all"
 					>
-						{t}
-					</span>
-				))}
-				<Button
-					variant="ghost"
-					size="xs"
-					onClick={() => onDelete(resource)}
-					className="ml-auto text-destructive hover:text-destructive hover:bg-destructive/10"
-				>
-					<Trash2 className="size-3 mr-1" />
-					Delete
-				</Button>
+						<Trash2 className="size-4" />
+					</Button>
+				</div>
 			</div>
 		</div>
 	);
