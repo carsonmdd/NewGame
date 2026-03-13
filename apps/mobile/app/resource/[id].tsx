@@ -1,9 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
+import { ChevronLeft, Bookmark, Globe, User, Calendar, Flag, Lightbulb, Construction, HelpCircle, Link as LinkIcon } from 'lucide-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import {
 	ScrollView,
-	Text,
 	TouchableOpacity,
 	View,
 } from 'react-native';
@@ -11,6 +10,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useSavedResources } from '@/contexts/SavedResourcesContext';
 import { Resource } from '@/types/resource';
+import { LinearBackground } from '@/components/ui/linear/LinearBackground';
+import { LinearCard } from '@/components/ui/linear/LinearCard';
+import { LinearText } from '@/components/ui/linear/LinearText';
+import { LinearButton } from '@/components/ui/linear/LinearButton';
 
 export default function ResourceDetailScreen() {
 	const { resource: resourceParam } = useLocalSearchParams<{
@@ -31,15 +34,16 @@ export default function ResourceDetailScreen() {
 
 	if (!resource) {
 		return (
-			<SafeAreaView className="flex-1 bg-[#0A0A0A] items-center justify-center">
-				<Text className="text-white">Resource not found</Text>
-				<TouchableOpacity
-					onPress={() => router.back()}
-					className="mt-4 px-6 py-2 bg-[#17133A] rounded-full"
-				>
-					<Text className="text-white font-bold">Go Back</Text>
-				</TouchableOpacity>
-			</SafeAreaView>
+			<LinearBackground>
+				<SafeAreaView className="flex-1 items-center justify-center">
+					<LinearText variant="body-large" className="text-foreground-muted mb-6">Resource not found</LinearText>
+					<LinearButton
+						title="Go Back"
+						onPress={() => router.back()}
+						variant="secondary"
+					/>
+				</SafeAreaView>
+			</LinearBackground>
 		);
 	}
 
@@ -55,23 +59,23 @@ export default function ResourceDetailScreen() {
 	};
 
 	return (
-		<View className="flex-1 bg-[#0A0A0A]">
-			<SafeAreaView edges={['top']} className="z-10 bg-[#0A0A0A]">
-				<View className="flex-row justify-between items-center px-5 py-3">
+		<LinearBackground>
+			<SafeAreaView edges={['top']} className="z-10">
+				<View className="flex-row justify-between items-center px-6 py-4">
 					<TouchableOpacity
 						onPress={() => router.back()}
-						className="w-10 h-10 items-center justify-center rounded-full bg-white/10"
+						className="w-11 h-11 items-center justify-center rounded-xl bg-white/5 border border-white/10"
 					>
-						<Ionicons name="chevron-back" size={24} color="white" />
+						<ChevronLeft size={22} color="white" />
 					</TouchableOpacity>
 					<TouchableOpacity
 						onPress={handleSaveToggle}
-						className="w-10 h-10 items-center justify-center rounded-full bg-white/10"
+						className={`w-11 h-11 items-center justify-center rounded-xl ${currentlySaved ? 'bg-accent/20 border-accent/40' : 'bg-white/5 border-white/10'}`}
 					>
-						<Ionicons
-							name={currentlySaved ? 'bookmark' : 'bookmark-outline'}
-							size={22}
-							color={currentlySaved ? '#4E46E5' : 'white'}
+						<Bookmark
+							size={20}
+							fill={currentlySaved ? '#5E6AD2' : 'none'}
+							color={currentlySaved ? '#5E6AD2' : 'white'}
 						/>
 					</TouchableOpacity>
 				</View>
@@ -79,49 +83,39 @@ export default function ResourceDetailScreen() {
 
 			<ScrollView
 				className="flex-1"
-				contentContainerClassName="px-6 pb-12 pt-2"
+				contentContainerClassName="px-6 pb-20 pt-2"
 				showsVerticalScrollIndicator={false}
 			>
 				{/* Header Section */}
-				<View className="mb-8">
-					<Text className="text-white text-[28px] font-black leading-[34px] mb-4">
+				<View className="mb-10">
+					<LinearText variant="label" className="mb-3 text-accent tracking-[0.2em]">
+						{resource.sourceType || 'RESOURCE'}
+					</LinearText>
+					<LinearText variant="h1" className="mb-6 leading-tight">
 						{resource.title}
-					</Text>
+					</LinearText>
 
-					<View className="flex-row flex-wrap items-center gap-y-2">
-						<View className="flex-row items-center mr-4">
-							<Ionicons name="person-outline" size={16} color="#94A3B8" />
-							<Text className="text-[#94A3B8] text-sm ml-1.5 font-medium">
+					<View className="flex-row flex-wrap items-center gap-y-3">
+						<View className="flex-row items-center mr-6 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
+							<User size={14} color="#8A8F98" />
+							<LinearText variant="body" className="text-foreground-muted text-sm ml-2 font-medium">
 								{resource.author || 'Unknown Author'}
-							</Text>
+							</LinearText>
 						</View>
-						<View className="flex-row items-center">
-							<Ionicons name="globe-outline" size={16} color="#94A3B8" />
-							<Text className="text-[#94A3B8] text-sm ml-1.5 font-medium">
+						<View className="flex-row items-center bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
+							<Globe size={14} color="#8A8F98" />
+							<LinearText variant="body" className="text-foreground-muted text-sm ml-2 font-medium">
 								{resource.source || 'Unknown Source'}
-							</Text>
+							</LinearText>
 						</View>
 					</View>
 
 					{resource.date && (
-						<Text className="text-[#64748B] text-xs mt-3 font-medium uppercase tracking-wider">
-							Published: {new Date(resource.date).toLocaleDateString()}
-						</Text>
-					)}
-				</View>
-
-				{/* Quick Stats/Metadata */}
-				<View className="flex-row flex-wrap gap-2 mb-8">
-					<View className="bg-[#17133A] px-3 py-1.5 rounded-lg border border-white/5">
-						<Text className="text-[#A5B4FC] text-[11px] font-bold uppercase">
-							{resource.sourceType || 'General'}
-						</Text>
-					</View>
-					{resource.evergreen === 'true' && (
-						<View className="bg-[#064E3B] px-3 py-1.5 rounded-lg border border-[#059669]/20">
-							<Text className="text-[#34D399] text-[11px] font-bold uppercase">
-								Evergreen
-							</Text>
+						<View className="flex-row items-center mt-5">
+							<Calendar size={12} color="rgba(255,255,255,0.4)" />
+							<LinearText variant="label" className="ml-2 lowercase tracking-normal">
+								Published: {new Date(resource.date).toLocaleDateString()}
+							</LinearText>
 						</View>
 					)}
 				</View>
@@ -129,44 +123,44 @@ export default function ResourceDetailScreen() {
 				{/* Main Content Sections */}
 				<DetailSection
 					title="Central Claim"
-					icon="flag-outline"
+					icon={<Flag size={18} color="#5E6AD2" />}
 					content={resource.centralClaim}
 				/>
 
 				<DetailSection
 					title="Core Knowledge"
-					icon="bulb-outline"
+					icon={<Lightbulb size={18} color="#5E6AD2" />}
 					content={resource.coreKnowledge}
 				/>
 
 				<DetailSection
 					title="Practical Takeaway"
-					icon="construct-outline"
+					icon={<Construction size={18} color="#5E6AD2" />}
 					content={resource.practicalTakeaway}
 				/>
 
 				{resource.openQuestions && (
 					<DetailSection
 						title="Open Questions"
-						icon="help-circle-outline"
+						icon={<HelpCircle size={18} color="#5E6AD2" />}
 						content={resource.openQuestions}
 					/>
 				)}
 
 				{resource.keywords && resource.keywords.length > 0 && (
-					<View className="mt-4">
-						<Text className="text-white/40 text-[11px] font-bold uppercase tracking-widest mb-3">
+					<View className="mt-8">
+						<LinearText variant="label" className="mb-4 tracking-widest text-foreground-subtle">
 							Keywords
-						</Text>
-						<View className="flex-row flex-wrap gap-2">
+						</LinearText>
+						<View className="flex-row flex-wrap gap-2.5">
 							{resource.keywords.map((keyword, index) => (
 								<View
 									key={index}
-									className="bg-white/5 px-3 py-1 rounded-full border border-white/5"
+									className="bg-accent/10 px-4 py-2 rounded-full border border-accent/20"
 								>
-									<Text className="text-[#94A3B8] text-xs font-medium">
+									<LinearText variant="body" className="text-accent text-xs font-semibold tracking-tight">
 										{keyword}
-									</Text>
+									</LinearText>
 								</View>
 							))}
 						</View>
@@ -175,20 +169,16 @@ export default function ResourceDetailScreen() {
 
 				{/* Original Link */}
 				{resource.url && (
-					<TouchableOpacity
-						className="mt-10 bg-white/5 py-4 rounded-2xl items-center justify-center border border-white/10"
-						activeOpacity={0.7}
-					>
-						<View className="flex-row items-center">
-							<Ionicons name="link-outline" size={18} color="white" />
-							<Text className="text-white font-bold ml-2">
-								View Original Source
-							</Text>
-						</View>
-					</TouchableOpacity>
+					<View className="mt-12">
+						<LinearButton
+							title="View Original Source"
+							icon={<LinkIcon size={18} color="white" />}
+							onPress={() => {}}
+						/>
+					</View>
 				)}
 			</ScrollView>
-		</View>
+		</LinearBackground>
 	);
 }
 
@@ -198,26 +188,29 @@ function DetailSection({
 	content,
 }: {
 	title: string;
-	icon: any;
+	icon: React.ReactNode;
 	content?: string;
 }) {
 	if (!content) return null;
 
 	return (
-		<View className="mb-8">
-			<View className="flex-row items-center mb-3">
-				<View className="w-8 h-8 items-center justify-center rounded-lg bg-[#4E46E5]/10 mr-2.5">
-					<Ionicons name={icon} size={18} color="#4E46E5" />
+		<View className="mb-10">
+			<View className="flex-row items-center mb-4">
+				<View className="w-9 h-9 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 mr-3.5">
+					{icon}
 				</View>
-				<Text className="text-white/40 text-[11px] font-bold uppercase tracking-widest">
+				<LinearText variant="label" className="text-foreground-subtle">
 					{title}
-				</Text>
+				</LinearText>
 			</View>
-			<View className="bg-[#161616] p-5 rounded-[20px] border border-white/5">
-				<Text className="text-[#E2E8F0] text-[15px] leading-[24px] font-medium">
+			<LinearCard
+				intensity={10}
+				containerClassName="p-6 border-white/5 bg-white/[0.03]"
+			>
+				<LinearText variant="body" className="text-foreground/90 leading-relaxed font-medium">
 					{content}
-				</Text>
-			</View>
+				</LinearText>
+			</LinearCard>
 		</View>
 	);
 }

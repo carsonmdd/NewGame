@@ -2,13 +2,19 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
 	ScrollView,
-	Text,
 	TouchableOpacity,
 	View,
+	ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { RefreshCcw, TrendingUp, Clock, User } from 'lucide-react-native';
 
 import { resourceApi } from '@/lib/api';
 import { Resource } from '@/types/resource';
+import { LinearBackground } from '@/components/ui/linear/LinearBackground';
+import { LinearCard } from '@/components/ui/linear/LinearCard';
+import { LinearText } from '@/components/ui/linear/LinearText';
+import { LinearButton } from '@/components/ui/linear/LinearButton';
 
 export default function HomeScreen() {
 	const [trending, setTrending] = useState<Resource[]>([]);
@@ -22,8 +28,8 @@ export default function HomeScreen() {
 			setLoading(true);
 			setError('');
 			const response = await resourceApi.discover();
-			setTrending(response.data.trending);
-			setLatest(response.data.new);
+			setTrending(response.data.trending || []);
+			setLatest(response.data.new || []);
 		} catch (e) {
 			setError('Failed to load resources.');
 		} finally {
@@ -46,85 +52,123 @@ export default function HomeScreen() {
 	};
 
 	return (
-		<View className="flex-1 bg-[#0A0A0A]">
-			<ScrollView
-				showsVerticalScrollIndicator={false}
-				contentContainerClassName="px-5 pt-[18px] pb-8"
-			>
-				<View className="flex-row justify-between items-center mb-5">
-					<Text className="text-white text-2xl font-bold">Home</Text>
+		<LinearBackground>
+			<SafeAreaView edges={['top']} className="flex-1">
+				<View className="px-6 py-4 flex-row justify-between items-center">
+					<View>
+						<LinearText variant="label" className="text-accent tracking-[0.2em] mb-1">DISCOVER</LinearText>
+						<LinearText variant="h2">Home</LinearText>
+					</View>
+					<TouchableOpacity 
+						onPress={loadResources}
+						className="w-10 h-10 items-center justify-center rounded-xl bg-white/5 border border-white/10"
+					>
+						<RefreshCcw size={18} color="rgba(255,255,255,0.6)" />
+					</TouchableOpacity>
 				</View>
 
-				{error ? (
-					<View className="py-10 items-center">
-						<Text className="text-red-400 mb-4">{error}</Text>
-						<TouchableOpacity
-							onPress={loadResources}
-							className="px-6 py-2 bg-white/10 rounded-full"
-						>
-							<Text className="text-white font-bold">Retry</Text>
-						</TouchableOpacity>
-					</View>
-				) : null}
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					contentContainerClassName="px-6 pt-2 pb-12"
+				>
+					{error ? (
+						<View className="py-20 items-center px-10">
+							<LinearText variant="body" className="text-red-400 text-center mb-6">{error}</LinearText>
+							<LinearButton
+								title="Retry"
+								onPress={loadResources}
+								variant="secondary"
+							/>
+						</View>
+					) : null}
 
-				<View className="mb-6">
-					<View className="flex-row justify-between items-center mb-3">
-						<Text className="text-white text-lg font-bold">Trending</Text>
-					</View>
+					{/* Trending Section */}
+					<View className="mb-10">
+						<View className="flex-row items-center mb-5">
+							<TrendingUp size={18} color="#5E6AD2" />
+							<LinearText variant="h3" className="ml-3">Trending</LinearText>
+						</View>
 
-					{loading && trending.length === 0 ? (
-						<View className="h-40 bg-[#161616] rounded-[20px] animate-pulse" />
-					) : (
-						trending.map((item) => (
-							<TouchableOpacity
-								key={item.id}
-								activeOpacity={0.85}
-								onPress={() => handleResourcePress(item)}
-								className="h-[185px] rounded-[20px] bg-[#161616] mb-4 overflow-hidden relative"
-							>
-								<View className="absolute inset-0 bg-[#2B2B2B]" />
-								<View className="flex-1 justify-end px-[18px] pb-[18px]">
-									<Text
-										className="text-white text-[17px] font-bold leading-[22px]"
-										numberOfLines={2}
+						{loading && trending.length === 0 ? (
+							<View className="h-48 rounded-2xl bg-white/5 items-center justify-center border border-white/5">
+								<ActivityIndicator color="#5E6AD2" />
+							</View>
+						) : (
+							trending.map((item) => (
+								<TouchableOpacity
+									key={item.id}
+									activeOpacity={0.85}
+									onPress={() => handleResourcePress(item)}
+									className="mb-5"
+								>
+									<LinearCard
+										intensity={15}
+										containerClassName="h-48 justify-end p-6 border-white/5"
 									>
-										{item.title}
-									</Text>
-								</View>
-							</TouchableOpacity>
-						))
-					)}
-				</View>
-
-				<View className="mb-6">
-					<View className="flex-row justify-between items-center mb-3">
-						<Text className="text-white text-lg font-bold">Latest</Text>
+										<LinearText variant="label" className="text-accent/80 mb-2">
+											{item.sourceType || 'TRENDING'}
+										</LinearText>
+										<LinearText
+											variant="h3"
+											className="text-lg font-bold leading-tight"
+											numberOfLines={2}
+										>
+											{item.title}
+										</LinearText>
+										<View className="flex-row items-center mt-4">
+											<View className="w-6 h-6 rounded-full bg-accent/20 items-center justify-center mr-2">
+												<User size={12} color="#5E6AD2" />
+											</View>
+											<LinearText variant="body" className="text-foreground-muted text-xs">
+												{item.author || 'Unknown Author'}
+											</LinearText>
+										</View>
+									</LinearCard>
+								</TouchableOpacity>
+							))
+						)}
 					</View>
 
-					{loading && latest.length === 0 ? (
-						<View className="h-40 bg-[#161616] rounded-[20px] animate-pulse" />
-					) : (
-						latest.map((item) => (
-							<TouchableOpacity
-								key={item.id}
-								activeOpacity={0.85}
-								onPress={() => handleResourcePress(item)}
-								className="h-[185px] rounded-[20px] bg-[#161616] mb-4 overflow-hidden relative"
-							>
-								<View className="absolute inset-0 bg-[#2B2B2B]" />
-								<View className="flex-1 justify-end px-[18px] pb-[18px]">
-									<Text
-										className="text-white text-[17px] font-bold leading-[22px]"
-										numberOfLines={2}
+					{/* Latest Section */}
+					<View className="mb-10">
+						<View className="flex-row items-center mb-5">
+							<Clock size={18} color="#5E6AD2" />
+							<LinearText variant="h3" className="ml-3">Latest</LinearText>
+						</View>
+
+						{loading && latest.length === 0 ? (
+							<View className="h-48 rounded-2xl bg-white/5 items-center justify-center border border-white/5">
+								<ActivityIndicator color="#5E6AD2" />
+							</View>
+						) : (
+							latest.map((item) => (
+								<TouchableOpacity
+									key={item.id}
+									activeOpacity={0.85}
+									onPress={() => handleResourcePress(item)}
+									className="mb-5"
+								>
+									<LinearCard
+										intensity={10}
+										containerClassName="h-40 justify-end p-6 border-white/5"
 									>
-										{item.title}
-									</Text>
-								</View>
-							</TouchableOpacity>
-						))
-					)}
-				</View>
-			</ScrollView>
-		</View>
+										<LinearText variant="label" className="text-foreground-subtle mb-2">
+											{item.sourceType || 'LATEST'}
+										</LinearText>
+										<LinearText
+											variant="h3"
+											className="text-base font-bold leading-tight"
+											numberOfLines={2}
+										>
+											{item.title}
+										</LinearText>
+									</LinearCard>
+								</TouchableOpacity>
+							))
+						)}
+					</View>
+				</ScrollView>
+			</SafeAreaView>
+		</LinearBackground>
 	);
 }

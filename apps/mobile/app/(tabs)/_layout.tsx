@@ -1,5 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { BlurView } from 'expo-blur';
+import { Platform, StyleSheet } from 'react-native';
 
 import Feather from '@expo/vector-icons/Feather';
 import { HapticTab } from '@/components/haptic-tab';
@@ -13,9 +15,27 @@ export default function TabLayout() {
 	return (
 		<Tabs
 			screenOptions={{
-				tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+				tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
+				tabBarInactiveTintColor: Colors[colorScheme ?? 'dark'].icon,
 				headerShown: false,
 				tabBarButton: HapticTab,
+				tabBarStyle: {
+					position: 'absolute',
+					borderTopWidth: 1,
+					borderTopColor: 'rgba(255,255,255,0.06)',
+					backgroundColor: Platform.OS === 'ios' ? 'transparent' : '#0a0a0c',
+					height: 85,
+					paddingBottom: 25,
+					paddingTop: 10,
+				},
+				tabBarBackground: () =>
+					Platform.OS === 'ios' ? (
+						<BlurView
+							intensity={30}
+							tint="dark"
+							style={StyleSheet.absoluteFill}
+						/>
+					) : null,
 			}}
 		>
 			<Tabs.Screen
@@ -23,7 +43,7 @@ export default function TabLayout() {
 				options={{
 					title: 'Home',
 					tabBarIcon: ({ color }) => (
-						<IconSymbol size={28} name="house.fill" color={color} />
+						<IconSymbol size={24} name="house.fill" color={color} />
 					),
 				}}
 			/>
@@ -32,7 +52,7 @@ export default function TabLayout() {
 				options={{
 					title: 'Search',
 					tabBarIcon: ({ color }) => (
-						<Feather size={28} name="search" color={color} />
+						<Feather size={24} name="search" color={color} />
 					),
 				}}
 			/>
@@ -42,7 +62,7 @@ export default function TabLayout() {
 					title: 'Saved',
 					tabBarIcon: ({ color }) => (
 						<IconSymbol
-							size={28}
+							size={24}
 							name="bookmark.fill"
 							color={color}
 						/>

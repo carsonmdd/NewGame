@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Trash2, X, Search, Plus, Bookmark, ChevronLeft, LayoutGrid } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
@@ -6,7 +6,6 @@ import {
 	FlatList,
 	Modal,
 	ScrollView,
-	Text,
 	TextInput,
 	TouchableOpacity,
 	View,
@@ -18,6 +17,10 @@ import {
 
 import { useSavedResources } from '@/contexts/SavedResourcesContext';
 import { Resource } from '@/types/resource';
+import { LinearBackground } from '@/components/ui/linear/LinearBackground';
+import { LinearCard } from '@/components/ui/linear/LinearCard';
+import { LinearText } from '@/components/ui/linear/LinearText';
+import { LinearButton } from '@/components/ui/linear/LinearButton';
 
 type Collection = {
 	id: string;
@@ -31,9 +34,6 @@ type GridItem =
 type ModalTile =
 	| { id: string; kind: 'add' }
 	| { id: string; kind: 'resource'; resource: Resource };
-
-const TEXT = '#F9FAFB';
-const MUTED = '#9CA3AF';
 
 const NAME_MAX = 22;
 
@@ -56,6 +56,7 @@ export default function SavedScreen() {
 	const [isEditingTitle, setIsEditingTitle] = useState(false);
 	const [draftName, setDraftName] = useState('');
 	const [collectionSearch, setCollectionSearch] = useState('');
+	const [isSearchFocused, setIsSearchFocused] = useState(false);
 
 	const openCollection = useMemo(() => {
 		if (!openCollectionId) return null;
@@ -161,7 +162,6 @@ export default function SavedScreen() {
 		];
 	}, [collections]);
 
-	// Group into 2-column rows for ScrollView rendering
 	const collectionRows = useMemo(() => {
 		const rows: GridItem[][] = [];
 		for (let i = 0; i < gridData.length; i += 2) {
@@ -193,7 +193,7 @@ export default function SavedScreen() {
 
 		if (openCollection.id === 'recent') {
 			return filteredSavedResources.map((resource) => ({
-				id: resource.id || resource.id,
+				id: resource.id,
 				kind: 'resource' as const,
 				resource,
 			}));
@@ -203,306 +203,287 @@ export default function SavedScreen() {
 	}, [openCollection, filteredSavedResources]);
 
 	return (
-		<SafeAreaView className="flex-1 bg-[#050509]" edges={['left', 'right']}>
-			<View className="flex-1 bg-[#050509] px-5" style={{ paddingTop: insets.top }}>
-				<ScrollView
-					contentContainerClassName="pb-6"
-					showsVerticalScrollIndicator={false}
-				>
-					<View className="flex-row items-center justify-between mb-1.5 mt-0.5">
-						<Text className="text-[#F9FAFB] text-[32px] font-extrabold tracking-tight leading-[38px]">Saved</Text>
-					</View>
-
-					<Text className="text-[#F9FAFB] text-[30px] font-extrabold mt-0 mb-3 leading-[36px]">Collections</Text>
-
-					<View className="pb-3">
-						{collectionRows.map((row, rowIndex) => (
-							<View
-								key={`row-${rowIndex}`}
-								className="flex-row gap-[18px] mb-[18px]"
-							>
-								{row.map((item) => {
-									if (item.kind === 'add') {
-										return (
-											<View
-												key={item.id}
-												className="flex-1 items-start"
-											>
-												<TouchableOpacity
-													activeOpacity={0.85}
-													onPress={addCollection}
-													className="w-[165px] h-[165px] rounded-full bg-[#2E2E2E] items-center justify-center"
-													accessibilityRole="button"
-													accessibilityLabel="Create new collection"
-												>
-													<Text
-														className="text-[#F9FAFB] text-[72px] font-extralight -mt-1.5"
-													>
-														+
-													</Text>
-												</TouchableOpacity>
-											</View>
-										);
-									}
-
-									const c = item.collection;
-									return (
-										<TouchableOpacity
-											key={c.id}
-											activeOpacity={0.85}
-											onPress={() =>
-												openModalForCollection(c)
-											}
-											className="flex-1"
-											accessibilityRole="button"
-											accessibilityLabel={`Open collection ${c.name}`}
-										>
-											<View
-												className="w-full h-[165px] rounded-[28px] bg-[#1A1F4A] mb-2.5"
-											/>
-											<Text
-												className="text-[#F9FAFB] text-[22px] font-bold"
-												numberOfLines={1}
-											>
-												{c.name}
-											</Text>
-										</TouchableOpacity>
-									);
-								})}
-
-								{/* Spacer when row has only one item */}
-								{row.length === 1 ? (
-									<View className="flex-1" />
-								) : null}
-							</View>
-						))}
-					</View>
-				</ScrollView>
-
-				<Modal
-					visible={!!openCollection}
-					animationType="slide"
-					presentationStyle="fullScreen"
-					onRequestClose={closeModal}
-				>
-					<SafeAreaView
-						className="flex-1 bg-[#050509]"
-						edges={['left', 'right']}
+		<LinearBackground>
+			<SafeAreaView className="flex-1" edges={['left', 'right']}>
+				<View className="flex-1 px-6" style={{ paddingTop: insets.top }}>
+					<ScrollView
+						contentContainerClassName="pb-24 pt-4"
+						showsVerticalScrollIndicator={false}
 					>
-						<View
-							className="flex-1 bg-[#050509]"
-							style={{ paddingTop: insets.top }}
-						>
-							<View className="px-5 pt-1 pb-2.5 flex-row items-start justify-between">
-								<View className="flex-1 pr-2.5">
-									{openCollection?.id === 'recent' ? (
-										<Text className="text-[#F9FAFB] text-[30px] font-extrabold leading-[36px]">
-											{openCollectionName}
-										</Text>
-									) : !isEditingTitle ? (
-										<TouchableOpacity
-											activeOpacity={0.8}
-											onPress={startEditingTitle}
-											accessibilityRole="button"
-											accessibilityLabel="Edit collection name"
-											className="py-1"
-										>
-											<Text
-												className="text-[#F9FAFB] text-[30px] font-extrabold leading-[36px]"
-												numberOfLines={1}
-											>
-												{openCollectionName}
-											</Text>
-										</TouchableOpacity>
-									) : (
-										<View className="pt-0.5">
-											<TextInput
-												value={draftName}
-												onChangeText={(t) =>
-													setDraftName(
-														sanitizeName(t),
-													)
-												}
-												className="text-[#F9FAFB] text-[28px] font-extrabold leading-[34px] py-1 px-0"
-												placeholder="Collection name"
-												placeholderTextColor={MUTED}
-												autoFocus
-												maxLength={NAME_MAX}
-												returnKeyType="done"
-												onSubmitEditing={saveTitle}
-												autoCorrect={false}
-											/>
-											<Text className="text-[#9CA3AF] text-[12px] mt-1">
-												Letters, numbers, spaces. Max{' '}
-												{NAME_MAX} characters.
-											</Text>
-										</View>
-									)}
-								</View>
+						<View className="mb-8">
+							<LinearText variant="label" className="text-accent tracking-[0.2em] mb-1">LIBRARY</LinearText>
+							<LinearText variant="h1">Saved</LinearText>
+						</View>
 
-								<View className="flex-row gap-2.5 items-center">
-									{openCollection?.id !== 'recent' && (
-										<TouchableOpacity
-											accessibilityRole="button"
-											accessibilityLabel="Delete collection"
-											activeOpacity={0.8}
-											onPress={deleteCollection}
-											className="p-2 rounded-full"
-										>
-											<Ionicons
-												name="trash-outline"
-												size={22}
-												color={TEXT}
-											/>
-										</TouchableOpacity>
-									)}
+						<View className="flex-row items-center mb-6">
+							<LayoutGrid size={18} color="#5E6AD2" />
+							<LinearText variant="h3" className="ml-3">Collections</LinearText>
+						</View>
 
-									<TouchableOpacity
-										accessibilityRole="button"
-										accessibilityLabel="Close collection"
-										activeOpacity={0.8}
-										onPress={closeModal}
-										className="p-2 rounded-full"
-									>
-										<Ionicons
-											name="close"
-											size={24}
-											color={TEXT}
-										/>
-									</TouchableOpacity>
-								</View>
-							</View>
-
-							{isEditingTitle && (
-								<View className="px-5 flex-row gap-2.5 mt-1 mb-1.5">
-									<TouchableOpacity
-										activeOpacity={0.85}
-										onPress={() => {
-											setDraftName(openCollectionName);
-											setIsEditingTitle(false);
-										}}
-										className="flex-1 h-10 rounded-full items-center justify-center border border-[#F9FAFB] bg-transparent"
-									>
-										<Text className="text-[#F9FAFB] text-[13px] font-extrabold">
-											Cancel
-										</Text>
-									</TouchableOpacity>
-
-									<TouchableOpacity
-										activeOpacity={0.85}
-										onPress={saveTitle}
-										className="flex-1 h-10 rounded-full items-center justify-center bg-[#F9FAFB]"
-									>
-										<Text
-											className="text-[13px] font-extrabold text-[#0B0B10]"
-										>
-											Save
-										</Text>
-									</TouchableOpacity>
-								</View>
-							)}
-
-							<View className="px-5 flex-row items-center gap-3 mt-2.5">
-								<View className="flex-1 flex-row items-center bg-[#2A2A2A] rounded-[14px] px-3.5 h-11">
-									<Ionicons
-										name="search"
-										size={18}
-										color={MUTED}
-										className="mr-2"
-									/>
-									<TextInput
-										value={collectionSearch}
-										onChangeText={setCollectionSearch}
-										placeholder="Search your collection"
-										placeholderTextColor={MUTED}
-										className="flex-1 text-[#F9FAFB] text-base py-0"
-										returnKeyType="search"
-									/>
-								</View>
-
-								<TouchableOpacity
-									activeOpacity={0.8}
-									onPress={() => {}}
-									accessibilityRole="button"
-									accessibilityLabel="Collection filters (not implemented)"
-									className="w-[52px] h-11 rounded-[14px] bg-[#2A2A2A] items-center justify-center"
+						<View>
+							{collectionRows.map((row, rowIndex) => (
+								<View
+									key={`row-${rowIndex}`}
+									className="flex-row gap-4 mb-4"
 								>
-									<Ionicons
-										name="options-outline"
-										size={22}
-										color={TEXT}
-									/>
-								</TouchableOpacity>
-							</View>
+									{row.map((item) => {
+										if (item.kind === 'add') {
+											return (
+												<TouchableOpacity
+													key={item.id}
+													activeOpacity={0.8}
+													onPress={addCollection}
+													className="flex-1"
+												>
+													<LinearCard 
+														intensity={10} 
+														containerClassName="h-44 items-center justify-center border-dashed border-white/20 bg-transparent"
+													>
+														<View className="w-12 h-12 rounded-full bg-white/5 items-center justify-center border border-white/10 mb-2">
+															<Plus size={24} color="#8A8F98" />
+														</View>
+														<LinearText variant="label" className="text-foreground-muted">New List</LinearText>
+													</LinearCard>
+												</TouchableOpacity>
+											);
+										}
 
-							<FlatList
-								contentContainerClassName="px-5 pt-5.5 pb-7"
-								data={modalTiles}
-								keyExtractor={(x) => x.id}
-								numColumns={2}
-								columnWrapperClassName="gap-3.5"
-								renderItem={({ item }) => {
-									if (item.kind === 'add') {
+										const c = item.collection;
 										return (
 											<TouchableOpacity
-												activeOpacity={0.8}
-												onPress={() => {}}
-												className="flex-1 h-[160px] rounded-[26px] bg-[#2E2E2E] items-center justify-center"
-												accessibilityRole="button"
-												accessibilityLabel="Add resource to collection (not implemented)"
+												key={c.id}
+												activeOpacity={0.85}
+												onPress={() =>
+													openModalForCollection(c)
+												}
+												className="flex-1"
 											>
-												<Text
-													className="text-[#F9FAFB] text-[72px] font-extralight -mt-1.5"
+												<LinearCard
+													intensity={15}
+													containerClassName="h-44 justify-end p-5 border-white/5"
 												>
-													+
-												</Text>
+													<View className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-accent/10 items-center justify-center border border-accent/20">
+														<Bookmark size={14} color="#5E6AD2" fill="#5E6AD2" />
+													</View>
+													<LinearText
+														variant="h3"
+														className="text-lg font-bold"
+														numberOfLines={1}
+													>
+														{c.name}
+													</LinearText>
+													<LinearText variant="label" className="text-[10px] mt-1 text-foreground-subtle">
+														{c.id === 'recent' ? `${savedResources.length} items` : 'Empty'}
+													</LinearText>
+												</LinearCard>
 											</TouchableOpacity>
 										);
-									}
+									})}
 
-									const resource = item.resource;
-
-									return (
-										<TouchableOpacity
-											activeOpacity={0.8}
-											className="flex-1 h-[160px] rounded-[26px] bg-[#2E2E2E] justify-end p-3.5"
-											onPress={() =>
-												router.push({
-													pathname: '/resource/[id]',
-													params: {
-														id: resource.id,
-														resource:
-															JSON.stringify(
-																resource,
-															),
-													},
-												})
-											}
-										>
-											<Text
-												className="text-[#F9FAFB] text-[26px] font-extrabold"
-												numberOfLines={2}
-											>
-												{resource.title}
-											</Text>
-										</TouchableOpacity>
-									);
-								}}
-								ListEmptyComponent={
-									openCollection?.id === 'recent' ? (
-										<Text
-											className="text-[#9CA3AF] text-base mt-2"
-										>
-											No saved resources yet.
-										</Text>
-									) : null
-								}
-								showsVerticalScrollIndicator={false}
-							/>
+									{row.length === 1 ? (
+										<View className="flex-1" />
+									) : null}
+								</View>
+							))}
 						</View>
-					</SafeAreaView>
-				</Modal>
-			</View>
-		</SafeAreaView>
+					</ScrollView>
+
+					<Modal
+						visible={!!openCollection}
+						animationType="slide"
+						presentationStyle="fullScreen"
+						onRequestClose={closeModal}
+					>
+						<LinearBackground>
+							<SafeAreaView
+								className="flex-1"
+								edges={['left', 'right']}
+							>
+								<View
+									className="flex-1"
+									style={{ paddingTop: insets.top }}
+								>
+									{/* Modal Header */}
+									<View className="px-6 py-4 flex-row items-start justify-between">
+										<View className="flex-1 pr-4">
+											{openCollection?.id === 'recent' ? (
+												<LinearText variant="h2" numberOfLines={1}>
+													{openCollectionName}
+												</LinearText>
+											) : !isEditingTitle ? (
+												<TouchableOpacity
+													activeOpacity={0.8}
+													onPress={startEditingTitle}
+													className="py-1"
+												>
+													<LinearText variant="h2" numberOfLines={1}>
+														{openCollectionName}
+													</LinearText>
+												</TouchableOpacity>
+											) : (
+												<View>
+													<TextInput
+														value={draftName}
+														onChangeText={(t) =>
+															setDraftName(
+																sanitizeName(t),
+															)
+														}
+														className="text-foreground text-2xl font-bold py-1 px-0 border-b border-accent"
+														placeholder="Collection name"
+														placeholderTextColor="#8A8F98"
+														autoFocus
+														maxLength={NAME_MAX}
+														returnKeyType="done"
+														onSubmitEditing={saveTitle}
+														autoCorrect={false}
+													/>
+												</View>
+											)}
+										</View>
+
+										<View className="flex-row gap-3 items-center">
+											{openCollection?.id !== 'recent' && (
+												<TouchableOpacity
+													activeOpacity={0.7}
+													onPress={deleteCollection}
+													className="w-10 h-10 items-center justify-center rounded-xl bg-white/5 border border-white/10"
+												>
+													<Trash2 size={18} color="#EF4444" />
+												</TouchableOpacity>
+											)}
+
+											<TouchableOpacity
+												activeOpacity={0.7}
+												onPress={closeModal}
+												className="w-10 h-10 items-center justify-center rounded-xl bg-white/5 border border-white/10"
+											>
+												<X size={20} color="white" />
+											</TouchableOpacity>
+										</View>
+									</View>
+
+									{isEditingTitle && (
+										<View className="px-6 flex-row gap-3 mt-2 mb-4">
+											<LinearButton
+												title="Cancel"
+												onPress={() => {
+													setDraftName(openCollectionName);
+													setIsEditingTitle(false);
+												}}
+												variant="secondary"
+												style={{ flex: 1 }}
+											/>
+											<LinearButton
+												title="Save"
+												onPress={saveTitle}
+												variant="primary"
+												style={{ flex: 1 }}
+											/>
+										</View>
+									)}
+
+									{/* Modal Search Bar */}
+									<View className="px-6 flex-row items-center gap-3 mt-4">
+										<View 
+											className={`flex-1 flex-row items-center bg-surface rounded-xl px-4 h-11 border ${isSearchFocused ? 'border-accent' : 'border-white/10'}`}
+										>
+											<Search
+												size={16}
+												color={isSearchFocused ? '#5E6AD2' : '#8A8F98'}
+												className="mr-2"
+											/>
+											<TextInput
+												value={collectionSearch}
+												onChangeText={setCollectionSearch}
+												onFocus={() => setIsSearchFocused(true)}
+												onBlur={() => setIsSearchFocused(false)}
+												placeholder="Search your collection"
+												placeholderTextColor="#8A8F98"
+												className="flex-1 text-foreground text-sm font-medium py-0"
+												returnKeyType="search"
+											/>
+										</View>
+									</View>
+
+									<FlatList
+										contentContainerClassName="px-6 pt-8 pb-12"
+										data={modalTiles}
+										keyExtractor={(x) => x.id}
+										numColumns={2}
+										columnWrapperClassName="gap-4"
+										renderItem={({ item }) => {
+											if (item.kind === 'add') {
+												return (
+													<TouchableOpacity
+														activeOpacity={0.8}
+														onPress={() => {}}
+														className="flex-1"
+													>
+														<LinearCard
+															intensity={10}
+															containerClassName="h-40 items-center justify-center border-dashed border-white/20 bg-transparent"
+														>
+															<Plus size={32} color="#8A8F98" />
+														</LinearCard>
+													</TouchableOpacity>
+												);
+											}
+
+											const resource = item.resource;
+
+											return (
+												<TouchableOpacity
+													activeOpacity={0.8}
+													className="flex-1"
+													onPress={() =>
+														router.push({
+															pathname: '/resource/[id]',
+															params: {
+																id: resource.id,
+																resource:
+																	JSON.stringify(
+																		resource,
+																	),
+															},
+														})
+													}
+												>
+													<LinearCard
+														intensity={15}
+														containerClassName="h-40 justify-end p-4 border-white/5"
+													>
+														<LinearText
+															variant="h3"
+															className="text-sm font-bold leading-tight"
+															numberOfLines={3}
+														>
+															{resource.title}
+														</LinearText>
+													</LinearCard>
+												</TouchableOpacity>
+											);
+										}}
+										ListEmptyComponent={
+											openCollection?.id === 'recent' ? (
+												<View className="py-10 items-center">
+													<LinearText
+														variant="body"
+														className="text-foreground-muted text-center"
+													>
+														No saved resources yet.
+													</LinearText>
+												</View>
+											) : null
+										}
+										showsVerticalScrollIndicator={false}
+									/>
+								</View>
+							</SafeAreaView>
+						</LinearBackground>
+					</Modal>
+				</View>
+			</SafeAreaView>
+		</LinearBackground>
 	);
 }

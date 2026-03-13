@@ -1,15 +1,14 @@
-import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { useHits, UseHitsProps } from 'react-instantsearch-core';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 
 import { ResourceCard } from '@/components/ResourceCard';
 import { Resource } from '@/types/resource';
 import { getSearchSortMode } from '@/lib/searchSort';
+import { LinearText } from './ui/linear/LinearText';
 
 export function AlgoliaHits(props: UseHitsProps<Resource>) {
 	const { hits } = useHits(props);
-	const router = useRouter();
 
 	const visibleHits = useMemo(() => {
 		const sortMode = getSearchSortMode();
@@ -31,9 +30,12 @@ export function AlgoliaHits(props: UseHitsProps<Resource>) {
 
 	if (visibleHits.length === 0) {
 		return (
-			<Text className="text-white/65 text-[13px] mb-2">
+			<LinearText
+				variant="body"
+				className="text-foreground-muted text-sm mb-4"
+			>
 				No resources found.
-			</Text>
+			</LinearText>
 		);
 	}
 
