@@ -298,7 +298,7 @@ export default function SavedScreen() {
 										intensity={18}
 										containerClassName="h-44 justify-between p-5 border-white/5 bg-white/[0.03]"
 									>
-										<View className="flex-row justify-between items-start">
+										<View className="flex-row justify-between items-start mb-6">
 											<View className="w-8 h-8 rounded-lg bg-white/5 items-center justify-center border border-white/10">
 												<LayoutGrid
 													size={14}
@@ -316,7 +316,7 @@ export default function SavedScreen() {
 										<View>
 											<CustomText
 												variant="h3"
-												className="text-[15px] font-bold leading-tight mb-1"
+												className="text-[13px] font-bold leading-tight mb-3"
 												numberOfLines={2}
 											>
 												{c.name}
