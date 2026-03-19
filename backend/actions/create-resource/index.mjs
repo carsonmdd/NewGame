@@ -13,6 +13,10 @@ export const handler = async (event) => {
 		if (!event.body) {
 			return {
 				statusCode: 400,
+				headers: {
+					"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+					"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+				},
 				body: JSON.stringify({
 					error: {
 						code: "BAD_REQUEST",
@@ -31,6 +35,10 @@ export const handler = async (event) => {
 			if (!body[field]) {
 				return {
 					statusCode: 400,
+					headers: {
+						"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+						"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+					},
 					body: JSON.stringify({
 						error: {
 							code: "VALIDATION_ERROR",
@@ -46,19 +54,13 @@ export const handler = async (event) => {
 		const now = new Date().toISOString();
 
 		const resource = {
-			pk: "RESOURCE",
-			sk: resourceId,
-			id: resourceId,
-			title: body.title,
-			description: body.description ?? "",
-			resourceType: body.resourceType,
-			url: body.url,
-			tags: body.tags ?? [],
-			creatorId: body.creatorId ?? null,
-			difficulty: body.difficulty ?? null,
-			createdAt: now,
-			updatedAt: now,
-		};
+            ...body,
+            pk: "RESOURCE",
+            sk: resourceId,
+            id: resourceId,
+            createdAt: now,
+            updatedAt: now,
+        };
 
 		const command = new PutCommand({
 			TableName: "Resource",
@@ -70,6 +72,10 @@ export const handler = async (event) => {
 		// Return the created resource
 		return {
 			statusCode: 201,
+			headers: {
+				"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+				"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+			},
 			body: JSON.stringify({
 				data: resource,
 			}),
@@ -79,6 +85,10 @@ export const handler = async (event) => {
 
 		return {
 			statusCode: 500,
+			headers: {
+				"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+				"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+			},
 			body: JSON.stringify({
 				error: {
 					code: "INTERNAL_SERVER_ERROR",

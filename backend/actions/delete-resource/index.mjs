@@ -6,14 +6,19 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 export const handler = async (event) => {
 	try {
-		const { pk, sk } = event.pathParameters || {};
-		if (!pk || !sk) {
+		const pk = "RESOURCE"
+		const { sk } = event.pathParameters || {};
+		if (!sk) {
 			return {
 				statusCode: 400,
+				headers: {
+					"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+					"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+				},
 				body: JSON.stringify({
 					error: {
 						code: "VALIDATION_ERROR",
-						message: "Both PK and SK are required in the path",
+						message: "sk is required in the path",
 					},
 				}),
 			};
@@ -33,6 +38,10 @@ export const handler = async (event) => {
 
 		return {
 			statusCode: 200,
+			headers: {
+				"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+				"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+			},
 			body: JSON.stringify({
 				data: {
 					pk,
@@ -46,6 +55,10 @@ export const handler = async (event) => {
 
 		return {
 			statusCode: 500,
+			headers: {
+				"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+				"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+			},
 			body: JSON.stringify({
 				error: {
 					code: "INTERNAL_SERVER_ERROR",

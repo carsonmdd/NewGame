@@ -6,24 +6,31 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 export const handler = async (event) => {
 	try {
-		// 1. Extract path parameters
-		const { pk, sk } = event.pathParameters || {};
-		if (!pk || !sk) {
+		const pk = "RESOURCE"
+		const { sk } = event.pathParameters || {};
+		if (!sk) {
 			return {
 				statusCode: 400,
+				headers: {
+					"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+					"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+				},
 				body: JSON.stringify({
 					error: {
 						code: "VALIDATION_ERROR",
-						message: "Both pk and sk are required in the path",
+						message: "sk is required in the path",
 					},
 				}),
 			};
 		}
 
-		// 2. Parse request body
 		if (!event.body) {
 			return {
 				statusCode: 400,
+				headers: {
+					"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+					"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+				},
 				body: JSON.stringify({
 					error: {
 						code: "BAD_REQUEST",
@@ -35,23 +42,6 @@ export const handler = async (event) => {
 
 		const body = JSON.parse(event.body);
 
-		// 3. Validate resourceType if provided
-		if (
-			body.resourceType &&
-			!["guide", "video", "tool"].includes(body.resourceType)
-		) {
-			return {
-				statusCode: 400,
-				body: JSON.stringify({
-					error: {
-						code: "VALIDATION_ERROR",
-						message: "Invalid resourceType",
-					},
-				}),
-			};
-		}
-
-		// 4. Build DynamoDB UpdateExpression dynamically
 		const updateFields = { ...body, updatedAt: new Date().toISOString() };
 		const ExpressionAttributeNames = {};
 		const ExpressionAttributeValues = {};
@@ -83,6 +73,10 @@ export const handler = async (event) => {
 		return {
 			statusCode: 200,
 			headers: {
+				"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+				"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+			},
+			headers: {
 				"Content-Type": "application/json",
 				"Access-Control-Allow-Origin": "*",
 			},
@@ -97,6 +91,10 @@ export const handler = async (event) => {
 		if (error.name === "ConditionalCheckFailedException") {
 			return {
 				statusCode: 404,
+				headers: {
+					"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+					"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+				},
 				body: JSON.stringify({
 					error: {
 						code: "NOT_FOUND",
@@ -108,6 +106,10 @@ export const handler = async (event) => {
 
 		return {
 			statusCode: 500,
+			headers: {
+				"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+				"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+			},
 			body: JSON.stringify({
 				error: {
 					code: "INTERNAL_SERVER_ERROR",

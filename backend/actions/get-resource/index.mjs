@@ -6,15 +6,19 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 export const handler = async (event) => {
 	try {
-		// 1. Extract path parameters (pk and sk)
-		const { pk, sk } = event.pathParameters || {};
-		if (!pk || !sk) {
+		const pk = "RESOURCE"
+		const { sk } = event.pathParameters || {};
+		if (!sk) {
 			return {
 				statusCode: 400,
+				headers: {
+					"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+					"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+				},
 				body: JSON.stringify({
 					error: {
 						code: "VALIDATION_ERROR",
-						message: "Both pk and sk are required in the path",
+						message: "sk required in the path",
 					},
 				}),
 			};
@@ -25,7 +29,7 @@ export const handler = async (event) => {
 			TableName: "Resource",
 			Key: {
 				pk: pk,
-				sk: sk,
+				sk: sk
 			},
 		};
 
@@ -36,10 +40,14 @@ export const handler = async (event) => {
 		if (!result.Item) {
 			return {
 				statusCode: 404,
+				headers: {
+					"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+					"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+				},
 				body: JSON.stringify({
 					error: {
 						code: "NOT_FOUND",
-						message: `Resource with pk=${pk} and sk=${sk} does not exist`,
+						message: `Resource with pk=${pk} sk=${sk} does not exist`,
 					},
 				}),
 			};
@@ -49,8 +57,8 @@ export const handler = async (event) => {
 		return {
 			statusCode: 200,
 			headers: {
-				"Content-Type": "application/json",
-				"Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+				"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
 			},
 			body: JSON.stringify({
 				data: result.Item,
@@ -60,6 +68,10 @@ export const handler = async (event) => {
 		console.error("getResource error:", error);
 		return {
 			statusCode: 500,
+			headers: {
+				"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+				"Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
+			},
 			body: JSON.stringify({
 				error: {
 					code: "INTERNAL_SERVER_ERROR",

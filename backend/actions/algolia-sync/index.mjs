@@ -1,4 +1,4 @@
-import algoliasearch from 'algoliasearch';
+import { algoliasearch } from 'algoliasearch';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 
 const client = algoliasearch(
@@ -20,9 +20,10 @@ export const handler = async (event) => {
 			? unmarshall(record.dynamodb.NewImage)
 			: null;
 		const keys = unmarshall(record.dynamodb.Keys);
+		console.log('FULL DATA', fullData)
 
 		if (eventName === 'REMOVE') {
-			toDelete.push(keys.resourceID);
+			toDelete.push(keys.sk);
 		} else {
 			// Map resourceID to Algolia's required objectID
 			toSave.push({
